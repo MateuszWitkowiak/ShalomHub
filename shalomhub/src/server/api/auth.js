@@ -1,24 +1,11 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const cors = require("cors");
+const User = require("../models/User");
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+const router = express.Router();
 
-mongoose.connect("mongodb+srv://boskiraptor2:oFocmXHWMq3zDsjo@cluster0.1nr7u.mongodb.net/")
-    .then(() => console.log("MongoDB connected"))
-    .catch((err) => console.log(err));
-
-const userSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-});
-
-const User = mongoose.model("User", userSchema);
-
-app.post("/api/register", async (req, res) => {
+// Rejestracja użytkownika
+router.post("/register", async (req, res) => {
     const { email, password, confirmPassword } = req.body;
 
     if (password !== confirmPassword) {
@@ -46,7 +33,8 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-app.post("/api/login", async (req, res) => {
+// Logowanie użytkownika
+router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -62,7 +50,4 @@ app.post("/api/login", async (req, res) => {
     res.status(200).json({ message: "Login successful" });
 });
 
-
-app.listen(3001, () => {
-    console.log("Server is running on port 3001");
-});
+module.exports = router;

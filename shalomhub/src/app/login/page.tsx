@@ -2,6 +2,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Loader from '../components/Loader'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -23,7 +26,17 @@ export default function Login() {
 
             const data = await response.json();
             if (response.ok) {
-                router.push('/homepage');
+                toast.success('Log in successful!', {
+                    position: 'top-right',
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                setTimeout(() => {
+                    router.push('/home');
+                }, 2000);
             } else {
                 setError(data.error);
             }
@@ -34,15 +47,16 @@ export default function Login() {
 
     return (
         <div className="h-screen flex justify-between flex-col overflow-hidden">
+            <ToastContainer />
             {/* górny róg */}
             <div className="flex justify-start">
-                <div className="h-32 bg-primary w-64 transform -skew-x-[25deg] -ml-10 flex items-center justify-center text-white">
+                <div className="absolute top-0 h-32 bg-primary w-64 transform -skew-x-[25deg] -ml-10 flex items-center justify-center text-white">
                     <h1 className="text-center text-4xl font-semibold skew-x-[25deg]">Shalom</h1>
                 </div>
             </div>
 
             {/* formularz */}
-            <div className="flex justify-center mt-[-4rem]">
+            <div className="flex justify-center mt-[4rem]">
                 <div className="w-96 flex flex-col space-y-5 card p-10">
                     <h1 className="text-4xl text-primary font-semibold">Shalom!</h1>
                     <hr />

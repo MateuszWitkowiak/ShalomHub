@@ -2,6 +2,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Loader from '../components/Loader'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Register() {
     const [email, setEmail] = useState('');
@@ -25,8 +28,17 @@ export default function Register() {
 
             const data = await response.json();
             if (response.ok) {
-                // Jeśli rejestracja się powiedzie, przekieruj użytkownika na stronę logowania
-                router.push('/login');
+                toast.success('Registration successful!', {
+                    position: 'top-right',
+                    autoClose: 2000, // Czas trwania powiadomienia w ms
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                });
+                setTimeout(() => {
+                    router.push('/login');
+                }, 2000); // Przekierowanie po 3 sekundach
             } else {
                 setError(data.error);
             }
@@ -37,6 +49,7 @@ export default function Register() {
 
     return (
         <div className="h-screen flex justify-between flex-col overflow-hidden">
+            <ToastContainer />
             {/* Górny róg */}
             <div className="flex justify-start">
                 <div className="h-32 bg-primary w-64 transform -skew-x-[25deg] -ml-10 flex items-center justify-center text-white">
