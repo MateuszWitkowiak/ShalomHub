@@ -10,10 +10,13 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        setLoading(true);
 
         try {
             const response = await fetch('http://localhost:3001/api/login', {
@@ -31,7 +34,6 @@ export default function Login() {
                     autoClose: 2000,
                     hideProgressBar: false,
                     closeOnClick: true,
-                    pauseOnHover: true,
                     draggable: true,
                 });
                 setTimeout(() => {
@@ -42,12 +44,15 @@ export default function Login() {
             }
         } catch (error) {
             setError('An error occurred during login');
+        } finally {
+            setLoading(false)
         }
     };
 
     return (
         <div className="h-screen flex justify-between flex-col overflow-hidden">
             <ToastContainer />
+            {loading && <Loader />}
             {/* górny róg */}
             <div className="flex justify-start">
                 <div className="absolute top-0 h-32 bg-primary w-64 transform -skew-x-[25deg] -ml-10 flex items-center justify-center text-white">

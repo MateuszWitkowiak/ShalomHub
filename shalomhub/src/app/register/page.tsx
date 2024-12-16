@@ -11,11 +11,13 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false)
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        setLoading(true)
         // Wysłanie żądania do backendu
         try {
             const response = await fetch('http://localhost:3001/api/register', {
@@ -30,26 +32,28 @@ export default function Register() {
             if (response.ok) {
                 toast.success('Registration successful!', {
                     position: 'top-right',
-                    autoClose: 2000, // Czas trwania powiadomienia w ms
+                    autoClose: 2000,
                     hideProgressBar: false,
                     closeOnClick: true,
-                    pauseOnHover: true,
                     draggable: true,
                 });
                 setTimeout(() => {
                     router.push('/login');
-                }, 2000); // Przekierowanie po 3 sekundach
+                }, 2000);
             } else {
                 setError(data.error);
             }
         } catch (error) {
             setError('An error occurred during registration');
+        } finally {
+            setLoading(false)
         }
     };
 
     return (
         <div className="h-screen flex justify-between flex-col overflow-hidden">
             <ToastContainer />
+            {loading && <Loader />}
             {/* Górny róg */}
             <div className="flex justify-start">
                 <div className="h-32 bg-primary w-64 transform -skew-x-[25deg] -ml-10 flex items-center justify-center text-white">
