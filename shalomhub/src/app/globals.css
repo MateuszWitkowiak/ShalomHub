@@ -9,6 +9,10 @@
 .card{
   box-shadow: 0 0 3px gray;
 }
+
+.david-icon {
+  color: #1E5BC4;
+}
 :root {
   --background: #ffffff;
   --foreground: #171717;

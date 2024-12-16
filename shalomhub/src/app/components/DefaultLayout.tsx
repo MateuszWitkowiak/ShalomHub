@@ -8,7 +8,6 @@ interface DefaultLayoutProps {
 function DefaultLayout(props: DefaultLayoutProps) {
     return (
         <div>
-            <Header />
             <div className="content">{props.children}</div>
         </div>
     )
