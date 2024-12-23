@@ -18,7 +18,6 @@ export default function Register() {
         e.preventDefault();
 
         setLoading(true)
-        // Wysłanie żądania do backendu
         try {
             const response = await fetch('http://localhost:3001/api/register', {
                 method: 'POST',

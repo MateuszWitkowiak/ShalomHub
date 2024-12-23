@@ -29,6 +29,7 @@ export default function Login() {
 
             const data = await response.json();
             if (response.ok) {
+                localStorage.setItem('userEmail', email)
                 toast.success('Log in successful!', {
                     position: 'top-right',
                     autoClose: 2000,

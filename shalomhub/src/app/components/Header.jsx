@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import '@fortawesome/fontawesome-free/css/all.css';
 
 export default function Header() {
@@ -13,6 +13,12 @@ export default function Header() {
         { title: "Profile", path: "/profile" },
     ];
     const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        localStorage.removeItem('userEmail');
+        router.push('/login');
+    };
 
     return (
         <div className="p-5 bg-primary flex items-center">
@@ -34,6 +40,12 @@ export default function Header() {
                         {item.title}
                     </Link>
                 ))}
+                <button 
+                        onClick={handleLogout} 
+                        className="border border-white p-1.5 rounded bg-primary text-white hover:bg-white hover:text-primary transition-all"
+                    >
+                        Logout
+                    </button>
             </div>
         </div>
     );

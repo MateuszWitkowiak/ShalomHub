@@ -1,10 +1,14 @@
+"use client"
 import Header from "../components/Header"
 import DefaultLayout from "../components/DefaultLayout"
+import ProtectedRoute from "../components/ProtectedRoute";
 export default function Chat() {
   return (
-    <DefaultLayout>
-      <Header></Header>
-    </DefaultLayout>
+    <ProtectedRoute>
+      <DefaultLayout>
+        <Header></Header>
+      </DefaultLayout>
+    </ProtectedRoute>
   );
 }
 
