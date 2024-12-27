@@ -7,7 +7,7 @@ export default function Header() {
     const menuItems = [
         { title: "Home", path: "/home" },
         { title: "Add post", path: "/addpost" },
-        { title: "Shares", path: "/shares" },
+        { title: "Events", path: "/events" },
         { title: "Chat", path: "/chat" },
         { title: "Notifications", path: "/notifications" },
         { title: "Profile", path: "/profile" },
@@ -21,7 +21,7 @@ export default function Header() {
     };
 
     return (
-        <div className="p-5 bg-primary flex items-center">
+        <div className="p-5 bg-primary flex items-center shadow-lg shadow-blue-500/50">
             <h5 className="text-white text-3xl font-semibold flex items-center ml-3">
                 🕯️<i className="fas fa-star-of-david fa-fw mr-2"></i>
                 ShalomHub
@@ -41,11 +41,11 @@ export default function Header() {
                     </Link>
                 ))}
                 <button 
-                        onClick={handleLogout} 
-                        className="border border-white p-1.5 rounded bg-primary text-white hover:bg-white hover:text-primary transition-all"
-                    >
-                        Logout
-                    </button>
+                    onClick={handleLogout} 
+                    className="border border-white p-1.5 rounded bg-primary text-white hover:bg-white hover:text-primary transition-all"
+                >
+                    Logout
+                </button>
             </div>
         </div>
     );

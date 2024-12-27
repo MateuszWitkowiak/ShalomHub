@@ -42,8 +42,8 @@ export default function AddPost() {
       toast.success("Post added successfully");
       console.log(response.data);
       setTimeout(() => {
-        router.push("/home")
-      }, 2000)
+        router.push("/home");
+      }, 2000);
     } catch (error) {
       toast.error("Failed to add post");
       console.error(error);
@@ -54,13 +54,12 @@ export default function AddPost() {
     <DefaultLayout>
       <ProtectedRoute>
         <Header />
-        <div className="border border-gray-300 rounded-md p-5 m-5 h-[calc(100vh-7rem)] overflow-hidden">
-          <h1 className="text-3xl font-semibold text-gray-600 flex justify-center mt-1">
-            Add new post
-          </h1>
-          <div className="mt-5 flex flex-row">
+        <div className="border border-gray-300 rounded-md p-6 m-5 h-[calc(100vh-7rem)] overflow-hidden">
+          <h1 className="text-4xl font-semibold text-gray-700 text-center mb-6">Add New Post</h1>
+          
+          <div className="mt-5">
             <textarea
-              className="border-dashed border-gray-500 border-2 w-1/2 md:w-full h-24 p-5"
+              className="w-full h-36 p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               placeholder="Enter your description"
               value={description}
               onChange={handleDescriptionChange}
@@ -68,10 +67,10 @@ export default function AddPost() {
           </div>
 
           {description && (
-            <div className="flex justify-end mt-5">
+            <div className="flex justify-end mt-6">
               <button
                 onClick={handleAddPost}
-                className="font-semibold bg-primary text-white px-6 py-2 rounded-md"
+                className="bg-primary text-white font-semibold rounded-lg px-8 py-3 shadow-md hover:bg-primary-dark transition-all"
               >
                 Add Post
               </button>
