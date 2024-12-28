@@ -4,6 +4,7 @@ import DefaultLayout from "../components/DefaultLayout";
 import { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "../components/ProtectedRoute";
 import axios from "axios";
+import Link from "next/link";
 
 interface Comment {
   userId: string;
@@ -206,7 +207,9 @@ export default function Homepage() {
                   onClick={() => toggleModal(post._id)}
                 >
                   <h2 className="text-xl font-semibold text-gray-700">
-                    {post.userId.email || "Anonymous"}
+                    <Link href={post.userId.email === localStorage.getItem("userEmail") ? "/profile" : `/userProfile/${post.userId.email}`}>
+                      {post.userId.email || "Anonymous"}
+                    </Link>
                   </h2>
                   <p className="text-gray-600 mt-2">{post.description}</p>
                   <p className="text-sm text-gray-500 mt-2">
@@ -285,7 +288,11 @@ export default function Homepage() {
                         .find((post) => post._id === selectedPostId)
                         ?.comments.map((comment, index) => (
                           <div key={index} className="p-2 mt-2 bg-gray-100 rounded-md shadow-sm">
-                            <p className="font-semibold">{comment.userId}</p>
+                            <p className="font-semibold">
+                              <Link href={comment.userId === localStorage.getItem("userEmail") ? "/profile" : `/userProfile/${comment.userId}`}>
+                                {comment.userId}
+                              </Link>
+                            </p>
                             <p>{comment.text}</p>
                             <p className="text-sm text-gray-500">
                               Posted on: {new Date(comment.createdAt).toLocaleString()}
