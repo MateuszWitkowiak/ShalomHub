@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRoutes = require("./api/auth");
 const postRoutes = require("./api/posts");
 const profileRoutes = require("./api/profile");
+const eventRoutes = require("./api/events");
 
 const app = express();
 
@@ -17,6 +18,7 @@ mongoose.connect("mongodb+srv://boskiraptor2:oFocmXHWMq3zDsjo@cluster0.1nr7u.mon
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/events", eventRoutes);
 
 app.listen(3001, () => {
     console.log("Server is running on port 3001");
