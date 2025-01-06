@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "../components/ProtectedRoute";
+import SearchBar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
 
@@ -190,8 +191,9 @@ export default function Homepage() {
     <DefaultLayout>
       <ProtectedRoute>
         <Header />
+        <SearchBar />
         <div className="p-5">
-          <h1 className="text-5xl font-semibold mb-8 text-center text-gray-800">Posts</h1>
+          <h1 className="text-4xl font-semibold mb-8 text-center text-gray-800">Posts</h1>
 
           <div
             className="border-2 border-gray-300 p-6 rounded-lg mt-10 bg-white shadow-lg"

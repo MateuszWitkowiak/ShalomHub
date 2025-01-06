@@ -22,11 +22,14 @@ export default function EventsPage() {
     date: "",
     location: "",
   });
+  const [showModal, setShowModal] = useState(false);
+  const [eventParticipants, setEventParticipants] = useState<string[]>([]);
 
   const fetchEvents = async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/events");
-      setEvents(response.data);
+      const validEvents = response.data.filter((event: Event) => new Date(event.date) >= new Date());
+      setEvents(validEvents);
     } catch (err) {
       console.error("Error fetching events:", err);
     }
@@ -40,6 +43,11 @@ export default function EventsPage() {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) {
       alert("Please log in to create an event.");
+      return;
+    }
+
+    if (new Date(newEvent.date) < new Date()) {
+      alert("Cannot create an event in the past.");
       return;
     }
 
@@ -84,12 +92,20 @@ export default function EventsPage() {
     return event.attendees.includes(userEmail || "");
   };
 
+  const openParticipantsModal = (attendees: string[]) => {
+    setEventParticipants(attendees);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <DefaultLayout>
       <Header />
       <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
         <h1 className="text-4xl font-bold mb-6">Events</h1>
-
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Create New Event</h2>
           <div className="space-y-4">
@@ -136,7 +152,14 @@ export default function EventsPage() {
               <p>{event.description}</p>
               <p>Date: {new Date(event.date).toLocaleDateString()}</p>
               <p>Location: {event.location}</p>
-              <p>Attendees: {event.attendees.length}</p>
+              <p>Attendees: {event.attendees.length}
+                <button
+                  onClick={() => openParticipantsModal(event.attendees)}
+                  className="ml-2 text-blue-500 underline"
+                >
+                  View Attendees
+                </button>
+              </p>
               <button
                 onClick={() => toggleAttendEvent(event._id)}
                 className={`mt-4 px-4 py-2 rounded-md ${
@@ -149,6 +172,30 @@ export default function EventsPage() {
           ))}
         </ul>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg w-1/3">
+            <h2 className="text-2xl font-semibold mb-4">Event Participants</h2>
+            <ul className="space-y-4">
+              {eventParticipants.map((participant, index) => (
+                <li key={index} className="flex justify-between">
+                  <span>{participant}</span>
+                  <a href={`/userProfile/${participant}`} className="text-blue-500">
+                    Go to profile
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={closeModal}
+              className="mt-4 bg-gray-500 text-white py-2 px-4 rounded-md"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </DefaultLayout>
   );
 }
