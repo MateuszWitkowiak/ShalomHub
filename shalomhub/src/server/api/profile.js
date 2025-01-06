@@ -101,4 +101,32 @@ router.post('/:userId/friends/add', async (req, res) => {
   }
 });
 
+// Wyszukiwanie użytkowników na podstawie zapytania
+router.get('/searchUsers', async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ message: 'Query is required' });
+  }
+  const queryParts = query.trim().split(/\s+/);
+
+  try {
+    const users = await User.find({
+      $and: queryParts.map(part => ({
+        $or: [
+          { firstName: { $regex: part, $options: 'i' } },
+          { lastName: { $regex: part, $options: 'i' } }
+        ]
+      }))
+    }).select('firstName lastName email');
+
+    res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 module.exports = router;

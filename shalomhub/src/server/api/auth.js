@@ -6,7 +6,7 @@ const router = express.Router();
 
 // rejestracja
 router.post("/register", async (req, res) => {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword, firstName, lastName } = req.body;
 
     if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
@@ -23,6 +23,8 @@ router.post("/register", async (req, res) => {
     const newUser = new User({
         email,
         password: hashedPassword,
+        firstName,  // Dodajemy firstName
+        lastName,   // Dodajemy lastName
     });
 
     try {

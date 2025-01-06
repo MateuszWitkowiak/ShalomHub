@@ -10,6 +10,8 @@ export default function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false)
     const router = useRouter();
@@ -17,14 +19,14 @@ export default function Register() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        setLoading(true)
+        setLoading(true);
         try {
             const response = await fetch('http://localhost:3001/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password, confirmPassword }),
+                body: JSON.stringify({ email, password, confirmPassword, firstName, lastName }),
             });
 
             const data = await response.json();
@@ -45,12 +47,12 @@ export default function Register() {
         } catch (error) {
             setError('An error occurred during registration');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
     return (
-        <div className="h-screen flex justify-between flex-col overflow-hidden">
+        <div className="h-screen flex justify-between flex-col">
             <ToastContainer />
             {loading && <Loader />}
             {/* Górny róg */}
@@ -65,6 +67,22 @@ export default function Register() {
                 <div className="w-96 flex flex-col space-y-5 card p-10">
                     <h1 className="text-4xl text-primary font-semibold">Join us</h1>
                     <hr />
+
+                    <input
+                        type="text"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First name"
+                        className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
+                    />
+
+                    <input
+                        type="text"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Last name"
+                        className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
+                    />
 
                     <input
                         type="email"
