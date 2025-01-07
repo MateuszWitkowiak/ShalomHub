@@ -35,7 +35,8 @@
     "redux": "^5.0.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "tostify": "^0.0.1"
+    "tostify": "^0.0.1",
+    "uuid": "^11.0.4"
   },
   "devDependencies": {
     "@types/node": "^20",

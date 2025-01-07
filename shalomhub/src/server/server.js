@@ -6,6 +6,7 @@ const socketIo = require("socket.io");
 
 const Message = require('./models/Message');
 const Room = require('./models/Room');
+const User = require('./models/User')
 
 const app = express();
 const server = http.createServer(app);
@@ -56,6 +57,26 @@ io.on("connection", (socket) => {
         socket.join(roomId);
     });
 
+    socket.on("joinNotificationsRoom", async (userId) => {
+        if (!userId) {
+            console.error("No userId provided for joinNotificationsRoom");
+            return;
+        }
+
+        try {
+            const user = await User.findById(userId);
+            if (!user) {
+                console.error("User not found for joinNotificationsRoom:", userId);
+                return;
+            }
+
+            console.log(`User ${userId} joined notifications room.`);
+            socket.join(userId);
+        } catch (err) {
+            console.error("Error in joinNotificationsRoom:", err);
+        }
+    });
+
     socket.on("sendMessage", async (messageData) => {
         console.log("Received message data:", messageData);
         const { roomId, text, senderId, receiverId } = messageData;
@@ -81,13 +102,17 @@ io.on("connection", (socket) => {
 
             console.log("Emitting new message to room:", roomId);
             io.to(roomId).emit("newMessage", newMessage);
+
+            io.to(receiverId).emit("notification", {
+                message: `New message from ${newMessage.sender}`,
+                createdAt: new Date(),
+            });
         } catch (err) {
             console.error("Error sending message:", err);
             socket.emit("error", "Error sending the message.");
         }
     });
 });
-
 
 server.listen(3001, () => {
     console.log(`Server running on port 3001`);

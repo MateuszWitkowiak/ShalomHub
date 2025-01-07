@@ -1,6 +1,8 @@
 const express = require('express');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const router = express.Router();
+const { io } = require("../server");
 
 // pobranie danych profilu użytkownika
 router.get('/', async (req, res) => {
@@ -68,7 +70,7 @@ router.post('/:userId/friends/add', async (req, res) => {
   const { userId } = req.params;
   const { friendEmail } = req.body;
 
-  // dekodowanie - problem ze znakami specjalnymi w zapytaniu
+  // Dekodowanie - problem ze znakami specjalnymi w zapytaniu
   const decodedUserId = decodeURIComponent(userId); 
   const decodedFriendEmail = decodeURIComponent(friendEmail); 
 
@@ -88,11 +90,34 @@ router.post('/:userId/friends/add', async (req, res) => {
       return res.status(400).json({ message: 'Already friends' });
     }
 
+    // Dodanie użytkownika do listy znajomych
     user.friends.push(friend);
     friend.friends.push(user);
 
     await user.save();
     await friend.save();
+
+    // Tworzymy powiadomienie o dodaniu do znajomych
+    if (user.email !== friend.email) {
+      const notification = new Notification({
+        type: 'friend',
+        recipient: friend._id,  // Odbiorca powiadomienia to dodany znajomy
+        sender: user._id,       // Nadawca to użytkownik, który dodał do znajomych
+        relatedObject: null,    // Brak powiązanego obiektu
+        relatedObjectType: null, // Brak powiązanego obiektu
+        message: `${user.email} added you as a friend!`,  // Treść powiadomienia
+        isRead: false,
+      });
+
+      await notification.save();
+
+      // Emitowanie powiadomienia do autora posta przez WebSocket
+      io.to(friend.email).emit("notification", {
+        message: notification.message,
+        type: "friend",
+        senderEmail: user.email,
+      });
+    }
 
     res.status(200).json({ message: 'Friend added successfully' });
   } catch (err) {

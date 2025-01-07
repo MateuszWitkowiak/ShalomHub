@@ -2,6 +2,8 @@
   const Post = require("../models/Post");
   const User = require("../models/User");
   const router = express.Router();
+  const { io } = require("../server")
+  const Notification = require('../models/Notification');
 
   // dodawanie posta do bazy
   router.post("/add", async (req, res) => {
@@ -42,77 +44,119 @@
     }
   });
 
-  // lajki
+  // lajki + powaidomienie
   router.post("/like/:id", async (req, res) => {
     const { userEmail } = req.body;
     const postId = req.params.id;
 
     try {
-      const post = await Post.findById(postId);
-      if (!post) {
-        return res.status(404).json({ message: "Post not found" });
-      }
+        const post = await Post.findById(postId);
+        if (!post) return res.status(404).json({ message: "Post not found" });
 
-      const user = await User.findOne({ email: userEmail });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+        const user = await User.findOne({ email: userEmail });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-      const hasLiked = post.likedBy.includes(user._id);
-      if (hasLiked) {
-        post.likedBy = post.likedBy.filter((id) => id.toString() !== user._id.toString());
-        post.likesCount -= 1;
-      } else {
-        post.likedBy.push(user._id);
-        post.likesCount += 1;
-      }
+        const hasLiked = post.likedBy.includes(user._id);
 
-      await post.save();
-      
-      const updatedPost = await Post.findById(post._id).populate('userId', 'email');
-      res.status(200).json(updatedPost);
+        if (hasLiked) {
+            post.likedBy = post.likedBy.filter((id) => id.toString() !== user._id.toString());
+            post.likesCount -= 1;
+        } else {
+            post.likedBy.push(user._id);
+            post.likesCount += 1;
+
+            if (post.userId.toString() !== user._id.toString()) {
+                const notification = new Notification({
+                    type: "like",
+                    recipient: post.userId,
+                    sender: user._id,
+                    relatedObject: post._id,
+                    relatedObjectType: "post",
+                    message: `${user.email} liked your post!`,
+                    isRead: false,
+                });
+
+                await notification.save();
+
+                io.to(post.userId.toString()).emit("notification", {
+                    message: notification.message,
+                    type: "like",
+                    postId,
+                    createdAt: notification.createdAt,
+                });
+
+                console.log("Notification sent to user:", post.userId.toString());
+            }
+        }
+
+        await post.save();
+        const updatedPost = await Post.findById(post._id).populate("userId", "email");
+        res.status(200).json(updatedPost);
     } catch (error) {
-      console.error("Error liking post:", error);
-      res.status(500).json({ message: "Error occurred" });
+        console.error("Error liking/unliking post:", error);
+        res.status(500).json({ message: "Server error" });
     }
-  });
+});
 
-
-  // komentarze
+  
+  // Komentarze
   router.post("/comment/:id", async (req, res) => {
     const { text, userId } = req.body;
-
+  
     if (!text || !userId) {
       return res.status(400).json({ message: "Text and userId are required" });
     }
-
+  
     try {
       const postId = req.params.id;
       const post = await Post.findById(postId);
-
+  
       if (!post) {
         return res.status(404).json({ message: "Post not found" });
       }
-
+  
       const user = await User.findOne({ email: userId });
-
+  
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-
+  
       post.comments.push({ userId: user.email, text });
       await post.save();
-
+  
+      if (post.userId.email !== userId) {
+        const notification = new Notification({
+          type: "comment",
+          recipient: post.userId._id,
+          sender: user._id,
+          relatedObject: post._id,
+          relatedObjectType: "post",
+          message: `${userId} commented on your post!`,
+          isRead: false,
+        });
+        console.log(notification)
+        await notification.save();
+  
+        io.to(post.userId.toString()).emit("notification", {
+          message: notification.message,
+          type: "comment",
+          postId,
+          createdAt: notification.createdAt,
+        });
+        console.log("Emitted notification to room", post.userId.toString());
+      }
+  
       const updatedPost = await Post.findById(post._id)
         .populate('userId', 'email')
         .populate('comments.userId', 'email');
-
+  
       res.status(201).json(updatedPost);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server error" });
     }
   });
+  
 
   // edycja posta
   router.put("/edit/:id", async (req, res) => {
@@ -183,6 +227,29 @@
     }
   });
 
+  router.get("/notifications", async (req, res) => {
+    const { userId, limit = 10, skip = 0 } = req.query; // Domyślnie limit = 10 i skip = 0
+  
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+  
+      // pobieranie powiadomień z uwzględnieniem limitu i skipa
+      const notifications = await Notification.find({ recipient: user._id })
+        .sort({ createdAt: -1 })
+        .skip(Number(skip))  // pomija te powiadomienia które już zostały załadowane
+        .limit(Number(limit)); // ładuje okreslona liczbe powiadomień
+  
+      res.status(200).json(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
+  
+
+  
+  
 
 
   module.exports = router;

@@ -228,7 +228,7 @@ export default function Homepage() {
                       handleLike(post._id);
                     }}
                   >
-                    ❤️ {post.likesCount}
+                    🔥 {post.likesCount}
                   </button>
 
                   {post.userId.email === localStorage.getItem("userEmail") && (
