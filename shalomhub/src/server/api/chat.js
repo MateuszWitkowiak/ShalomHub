@@ -2,6 +2,7 @@ const express = require("express");
 const Message = require("../models/Message");
 const Room = require("../models/Room");
 const User = require("../models/User");
+const Notification = require("../models/Notification")
 const { io } = require("../server");
 
 const router = express.Router();
@@ -58,7 +59,7 @@ router.post("/rooms", async (req, res) => {
   }
 });
 
-// Wysyłanie wiadomości
+// Wysyłanie wiadomości + powiadomienie
 router.post("/sendMessage", async (req, res) => {
   const { roomId, text, senderId, receiverId } = req.body;
   console.log("Received message data:", { roomId, text, senderId, receiverId });
@@ -80,15 +81,33 @@ router.post("/sendMessage", async (req, res) => {
       sender: senderId,
       receiver: receiverId,
       text: text,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     room.messages.push(message);
     await room.save();
     await message.save();
 
-    // emitowanie wiadomosci
     io.to(roomId).emit("newMessage", message);
+
+    const notification = new Notification({
+      type: "message",
+      recipient: receiverId, 
+      sender: senderId,
+      message: `You have got a new message!`,
+      relatedObject: message._id,
+      relatedObjectType: "message",
+      isRead: false,
+    });
+
+    await notification.save();
+
+    io.to(receiverId).emit("notification", {
+      message: notification.message,
+      type: "message",
+      createdAt: notification.createdAt,
+    });
+
     res.status(200).json(message);
   } catch (err) {
     console.error("Error sending message:", err);
