@@ -5,6 +5,7 @@ import axios from "axios";
 import Header from "../../components/Header";
 import DefaultLayout from "../../components/DefaultLayout";
 import ProtectedRoute from "../../components/ProtectedRoute";
+import { v4 as uuidv4 } from "uuid";
 
 interface Friend {
   _id: string;
@@ -20,11 +21,14 @@ interface ProfileData {
   friends: Friend[];
 }
 
+type FriendRequestStatus = "none" | "pending" | "accepted" | "received";
+
 export default function UserProfile() {
   const { userId } = useParams<{ userId: string }>();
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [friendRequestStatus, setFriendRequestStatus] = useState<FriendRequestStatus>("none");
+  const [isFriend, setIsFriend] = useState(false);
 
   useEffect(() => {
     const currentUserEmail = localStorage.getItem("userEmail");
@@ -40,10 +44,7 @@ export default function UserProfile() {
     }
 
     const fetchUserProfile = async () => {
-      if (!userId) return;
-
       try {
-        // dekodowanie, problem ze znakami specjalnymi w zapytaniu
         const decodedUserId = decodeURIComponent(userId);
 
         const response = await axios.get(`http://localhost:3001/api/profile`, {
@@ -51,47 +52,73 @@ export default function UserProfile() {
         });
         setProfile(response.data);
 
-        const isAlreadyFriend = response.data.friends.some(
-          (friend: Friend) => friend.email === currentUserEmail
+        const friendRequestResponse = await axios.get(
+          `http://localhost:3001/api/profile/friendRequests/status/${currentUserEmail}`,
+          { params: { friendEmail: decodedUserId } }
         );
+        setFriendRequestStatus(friendRequestResponse.data.status);
+
+        const friendsList = response.data.friends;
+        const isAlreadyFriend = friendsList.some(friend => friend.email === currentUserEmail);
         setIsFriend(isAlreadyFriend);
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        console.error("Error fetching user profile or friend request status:", error);
       }
     };
 
     fetchUserProfile();
   }, [userId, router]);
 
-  const handleAddFriend = async () => {
-    const currentUserEmail = localStorage.getItem("userEmail");
-
-    if (!currentUserEmail) {
-      alert("Please log in to add friends.");
-      return;
-    }
-
-    if (userId === currentUserEmail) {
-      alert("You cannot add yourself as a friend.");
-      return;
-    }
-
+  const handleSendFriendRequest = async () => {
     try {
-      // dekodowanie - problem ze znakami specjalnymi
-      const encodedUserId = encodeURIComponent(userId);
-      const encodedCurrentUserEmail = encodeURIComponent(currentUserEmail);
+      const currentUserEmail = localStorage.getItem("userEmail");
+      if (!currentUserEmail) {
+        alert("Please log in to send friend requests.");
+        return;
+      }
 
-      await axios.post(
-        `http://localhost:3001/api/profile/${encodedCurrentUserEmail}/friends/add`,
-        {
-          friendEmail: userId,
-        }
-      );
+      if (isFriend) {
+        alert("You are already friends!");
+        return;
+      }
 
-      setIsFriend(true);
+      await axios.post(`http://localhost:3001/api/profile/friendRequests`, {
+        senderEmail: currentUserEmail,
+        receiverEmail: userId,
+        requestId: uuidv4(),
+      });
+
+      setFriendRequestStatus("pending");
     } catch (error) {
-      console.error("Error adding friend:", error);
-      alert("Could not add friend.");
+      console.error("Error sending friend request:", error);
+      alert("Could not send friend request.");
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    try {
+      const currentUserEmail = localStorage.getItem("userEmail");
+      if (!currentUserEmail) {
+        alert("Please log in to remove friends.");
+        return;
+      }
+
+      await axios.post(`http://localhost:3001/api/profile/removeFriend`, {
+        userEmail: userId,
+        friendEmail: currentUserEmail,
+      });
+
+      setProfile((prevProfile) => (prevProfile && {
+        ...prevProfile,
+        friends: prevProfile.friends.filter(
+          (friend) => friend.email !== currentUserEmail
+        ),
+      }));
+      setFriendRequestStatus("none");
+      setIsFriend(false);
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      alert("Could not remove friend.");
     }
   };
 
@@ -116,14 +143,49 @@ export default function UserProfile() {
           </h1>
           <p className="text-lg text-gray-700 mb-6">{profile.description}</p>
 
+          <div className="mt-6">
+            {friendRequestStatus === "none" && !isFriend && (
+              <button
+                onClick={handleSendFriendRequest}
+                className="w-full flex items-center justify-center space-x-2 p-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all"
+              >
+                <span>Send Friend Request</span>
+              </button>
+            )}
+            {friendRequestStatus === "pending" && !isFriend && (
+              <button
+                disabled
+                className="w-full flex items-center justify-center space-x-2 p-3 bg-yellow-500 text-white rounded-md"
+              >
+                <span>Request Pending</span>
+              </button>
+            )}
+            {friendRequestStatus === "received" && !isFriend && (
+              <button
+                disabled
+                className="w-full flex items-center justify-center space-x-2 p-3 bg-purple-500 text-white rounded-md"
+              >
+                <span>Request Received</span>
+              </button>
+            )}
+            {isFriend && (
+              <button
+                onClick={handleRemoveFriend}
+                className="w-full flex items-center justify-center space-x-2 p-3 bg-red-500 text-white rounded-md hover:bg-red-700 transition-all"
+              >
+                <span>Remove from Friends</span>
+              </button>
+            )}
+          </div>
+
           <h2 className="text-2xl font-semibold text-gray-800 mt-8">Friends</h2>
           <ul className="mt-4 space-y-4">
             {profile.friends.length > 0 ? (
               profile.friends.map((friend) => (
                 <li
-                  key={friend._id}
+                  key={`${friend._id}-${friend.email}`}
+                  onClick={() => router.push(`/userProfile/${encodeURIComponent(friend.email)}`)}
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-all"
-                  onClick={() => router.push(`/userProfile/${friend.email}`)}
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
@@ -139,25 +201,6 @@ export default function UserProfile() {
               <p className="text-lg text-gray-500">No friends found.</p>
             )}
           </ul>
-
-          <div className="mt-6">
-            {!isFriend && (
-              <button
-                onClick={handleAddFriend}
-                className="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all"
-              >
-                Add as Friend
-              </button>
-            )}
-            {isFriend && (
-              <button
-                disabled
-                className="w-full p-3 bg-gray-500 text-white rounded-md"
-              >
-                Already Friends
-              </button>
-            )}
-          </div>
         </div>
       </ProtectedRoute>
     </DefaultLayout>

@@ -30,7 +30,6 @@ export default function Homepage() {
   const [commentText, setCommentText] = useState<string>("");
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [postToEdit, setPostToEdit] = useState<Post | null>(null);
-
   const commentInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
@@ -219,7 +218,7 @@ export default function Homepage() {
                   </p>
 
                   <button
-                    className={`font-semibold mr-3 ${post.likedBy?.includes(localStorage.getItem("userEmail") || "")
+                    className={`font-semibold mr-3 ${post.likedBy?.includes(localStorage.getItem("userId") || "")
                       ? "text-red-500"
                       : "text-gray-500"
                       } transition-all hover:text-red-600`}

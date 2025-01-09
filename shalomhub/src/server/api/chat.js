@@ -7,10 +7,8 @@ const { io } = require("../server");
 
 const router = express.Router();
 
-// pobieranie wiadomości dla danych dwóch uzytkowników
 router.get("/messages/:roomId", async (req, res) => {
   const { roomId } = req.params;
-  console.log(`Fetching messages for room: ${roomId}`);
 
   try {
     const room = await Room.findById(roomId).populate("messages");
@@ -26,10 +24,8 @@ router.get("/messages/:roomId", async (req, res) => {
   }
 });
 
-// Tworzenie nowego pokoju jeżeli nie istnieje takowy
 router.post("/rooms", async (req, res) => {
   const { user1, user2 } = req.body;
-  console.log("Creating room for users:", user1, user2);
 
   try {
     const user1Obj = await User.findOne({ email: user1 });
@@ -51,7 +47,6 @@ router.post("/rooms", async (req, res) => {
       await room.save();
     }
 
-    console.log("Room created:", room);
     res.json(room);
   } catch (err) {
     console.error("Error creating room:", err);
@@ -59,11 +54,8 @@ router.post("/rooms", async (req, res) => {
   }
 });
 
-// Wysyłanie wiadomości + powiadomienie
 router.post("/sendMessage", async (req, res) => {
   const { roomId, text, senderId, receiverId } = req.body;
-  console.log("Received message data:", { roomId, text, senderId, receiverId });
-
   if (!roomId || !text || !senderId || !receiverId) {
     return res.status(400).json({ message: "Missing required fields" });
   }

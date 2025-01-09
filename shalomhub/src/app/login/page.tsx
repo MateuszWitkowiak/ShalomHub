@@ -67,7 +67,6 @@ export default function Login() {
                 <div className="w-96 flex flex-col space-y-5 card p-10">
                     <h1 className="text-4xl text-primary font-semibold">Shalom!</h1>
                     <hr />
-                    {/* Pole email */}
                     <input
                         type="email"
                         value={email}
@@ -75,7 +74,6 @@ export default function Login() {
                         placeholder="e-mail"
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
-                    {/* Pole hasło */}
                     <input
                         type="password"
                         value={password}
@@ -83,7 +81,6 @@ export default function Login() {
                         placeholder="password"
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3 text-xl placeholder:text-base"
                     />
-                    {/* Komunikat błędu */}
                     {error && <p className="text-red-500 text-sm">{error}</p>}
                     <div className="flex justify-end">
                         <button
@@ -99,8 +96,6 @@ export default function Login() {
                     </Link>
                 </div>
             </div>
-
-            {/* dolny róg */}
             <div className="flex justify-end mt-[-2.5rem]">
                 <div className="h-32 bg-primary w-64 transform skew-x-[25deg] -mr-10 flex items-center justify-center text-white">
                     <h1 className="text-center text-4xl font-semibold -skew-x-[25deg]">Hub</h1>

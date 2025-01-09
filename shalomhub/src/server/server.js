@@ -18,10 +18,8 @@ const io = socketIo(server, {
     }
 });
 
-// export żeby używać w innych plikach
 module.exports = { io };
 
-// Obsługa CORS
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -30,12 +28,10 @@ app.use(cors({
 
 app.use(express.json());
 
-// łączenie z bazą
 mongoose.connect("mongodb+srv://boskiraptor2:oFocmXHWMq3zDsjo@cluster0.1nr7u.mongodb.net/")
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.log("MongoDB connection error:", err));
 
-// routy
 const authRoutes = require("./api/auth");
 const postRoutes = require("./api/posts");
 const profileRoutes = require("./api/profile");
@@ -48,12 +44,9 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/chat", chatRoutes);
 
-// websocket - łączenie
 io.on("connection", (socket) => {
-    console.log("New WebSocket connection");
 
     socket.on("joinRoom", (roomId) => {
-        console.log(`User joined room: ${roomId}`);
         socket.join(roomId);
     });
 
@@ -70,7 +63,6 @@ io.on("connection", (socket) => {
                 return;
             }
 
-            console.log(`User ${userId} joined notifications room.`);
             socket.join(userId);
         } catch (err) {
             console.error("Error in joinNotificationsRoom:", err);
@@ -78,7 +70,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("sendMessage", async (messageData) => {
-        console.log("Received message data:", messageData);
         const { roomId, text, senderId, receiverId } = messageData;
 
         if (!roomId || !text || !senderId || !receiverId) {
@@ -94,13 +85,10 @@ io.on("connection", (socket) => {
             });
 
             await newMessage.save();
-            console.log("Message saved:", newMessage);
-
             await Room.findByIdAndUpdate(roomId, {
                 $push: { messages: newMessage._id },
             });
 
-            console.log("Emitting new message to room:", roomId);
             io.to(roomId).emit("newMessage", newMessage);
 
             io.to(receiverId).emit("notification", {
