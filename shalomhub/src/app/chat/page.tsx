@@ -38,9 +38,8 @@ export default function Chat() {
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
   
   useEffect(() => {
-    console.log("Connecting to Socket.IO...");
     socket.on("connect", () => {
-      console.log("Connected to Socket.IO!");
+      console.log("Połączono z socket.io");
     });
 
     return () => {
@@ -69,7 +68,6 @@ export default function Chat() {
   }, [userEmail, router]);
 
   const fetchMessages = async (roomId: string) => {
-    console.log(`Fetching messages for room: ${roomId}`);
     try {
       const response = await axios.get(`http://localhost:3001/api/chat/messages/${roomId}`);
       setMessages(response.data);
@@ -109,15 +107,11 @@ export default function Chat() {
 
     try {
       const response = await axios.post("http://localhost:3001/api/chat/sendMessage", messageData);
-
-      // Próba rozwiazania problemu z duplikatami wiadomości
       setMessages((prevMessages) => {
         const messageExists = prevMessages.some((message) => message._id === response.data._id);
         if (messageExists) {
-          console.log("Message already exists in the state, not adding it.");
           return prevMessages;
         }
-        console.log("Message added to state:", response.data);
         return [...prevMessages, response.data];
       });
 
@@ -128,26 +122,16 @@ export default function Chat() {
     }
   };
 
-  // Nasłuchiwanie na nowe wiadomości
   useEffect(() => {
-    console.log("Listening for new messages...");
 
     socket.on("newMessage", (newMessage: Message) => {
-      console.log("New message received:", newMessage);
-
-      // Problem z duplikatami wiadomości - rozwiązanie
       setMessages((prevMessages) => {
         const messageExists = prevMessages.some((message) => message._id === newMessage._id);
         if (messageExists) {
-          console.log("Message already exists in the state, not adding it.");
           return prevMessages;
         }
-
-        console.log("Message added to state:", newMessage);
         return [...prevMessages, newMessage];
       });
-
-      // Scrollowanie na dół chatu gdy przychdozi wiadomość
       if (chatEndRef.current) {
         chatEndRef.current.scrollIntoView({ behavior: "smooth" });
       }

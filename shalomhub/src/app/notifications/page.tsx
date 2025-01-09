@@ -78,12 +78,13 @@ export default function Notifications() {
       });
   };
 
-  // klikniecie w powiadomienie
   const handleNotificationClick = (notification: any) => {
     if (notification.type === "message") {
       router.push("/chat");
     } else if (notification.type === "like" || notification.type === "comment") {
       router.push("/home");
+    } else if (notification.type === "friendRequest" || notification.type === "friendRequestAccepted") {
+      router.push("/profile")
     }
   };
   

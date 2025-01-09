@@ -40,7 +40,6 @@ export default function AddPost() {
       });
 
       toast.success("Post added successfully");
-      console.log(response.data);
       setTimeout(() => {
         router.push("/home");
       }, 2000);

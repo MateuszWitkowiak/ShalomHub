@@ -4,7 +4,6 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const router = express.Router();
 
-// Tworzenie nowego wydarzenia
 router.post("/", async (req, res) => {
   try {
     const { title, description, date, location, createdBy } = req.body;
@@ -16,12 +15,11 @@ router.post("/", async (req, res) => {
     await event.save();
     res.status(201).send(event);
   } catch (err) {
-    console.error("Error creating event:", err); // Loguj błąd
+    console.error("Error creating event:", err);
     res.status(500).send({ message: "Error creating event", error: err });
   }
 });
 
-// Pobieranie wszystkich wydarzeń
 router.get("/", async (req, res) => {
   try {
     const events = await Event.find().populate("createdBy", "firstName lastName");
@@ -31,7 +29,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Zarządzanie uczestnictwem
 router.post("/:id/attend", async (req, res) => {
   try {
 
@@ -53,8 +50,6 @@ router.post("/:id/attend", async (req, res) => {
       console.error("Event not found with ID:", req.params.id);
       return res.status(404).send({ message: "Event not found" });
     }
-
-    console.log("Event attendees before update:", event.attendees);
 
     if (event.attendees.includes(userId)) {
       console.warn("User already attending event:", userId);

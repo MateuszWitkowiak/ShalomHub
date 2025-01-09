@@ -4,8 +4,7 @@
   const router = express.Router();
   const { io } = require("../server")
   const Notification = require('../models/Notification');
-
-  // dodawanie posta do bazy
+  
   router.post("/add", async (req, res) => {
     const { description, email } = req.body;
 
@@ -33,7 +32,6 @@
     }
   });
 
-  // pobieranie postów :) 
   router.get("/getAll", async (req, res) => {
     try {
       const posts = await Post.find().populate("userId", "email");
@@ -44,7 +42,6 @@
     }
   });
 
-  // lajki + powaidomienie
   router.post("/like/:id", async (req, res) => {
     const { userEmail } = req.body;
     const postId = req.params.id;
@@ -85,7 +82,6 @@
                     createdAt: notification.createdAt,
                 });
 
-                console.log("Notification sent to user:", post.userId.toString());
             }
         }
 
@@ -99,7 +95,6 @@
 });
 
   
-  // Komentarze
   router.post("/comment/:id", async (req, res) => {
     const { text, userId } = req.body;
   
@@ -134,7 +129,6 @@
           message: `${userId} commented on your post!`,
           isRead: false,
         });
-        console.log(notification)
         await notification.save();
   
         io.to(post.userId.toString()).emit("notification", {
@@ -143,7 +137,6 @@
           postId,
           createdAt: notification.createdAt,
         });
-        console.log("Emitted notification to room", post.userId.toString());
       }
   
       const updatedPost = await Post.findById(post._id)
@@ -157,8 +150,6 @@
     }
   });
   
-
-  // edycja posta
   router.put("/edit/:id", async (req, res) => {
     const { description, userEmail } = req.body;
     const postId = req.params.id;
@@ -194,7 +185,6 @@
     }
   });
 
-  // usun post
   router.delete("/delete/:id", async (req, res) => {
     const { userEmail } = req.body;
     const postId = req.params.id;
@@ -228,17 +218,15 @@
   });
 
   router.get("/notifications", async (req, res) => {
-    const { userId, limit = 10, skip = 0 } = req.query; // Domyślnie limit = 10 i skip = 0
+    const { userId, limit = 10, skip = 0 } = req.query;
   
     try {
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ message: "User not found" });
-  
-      // pobieranie powiadomień z uwzględnieniem limitu i skipa
       const notifications = await Notification.find({ recipient: user._id })
         .sort({ createdAt: -1 })
-        .skip(Number(skip))  // pomija te powiadomienia które już zostały załadowane
-        .limit(Number(limit)); // ładuje okreslona liczbe powiadomień
+        .skip(Number(skip))
+        .limit(Number(limit));
   
       res.status(200).json(notifications);
     } catch (error) {

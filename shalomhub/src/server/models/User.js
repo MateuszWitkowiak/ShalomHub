@@ -6,7 +6,9 @@ const userSchema = new mongoose.Schema({
     firstName: { type: String, default: "" },
     lastName: { type: String, default: "" },
     description: { type: String, default: "" },
-    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    friendRequestsSent: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+    friendRequestsReceived: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 });
 
 const User = mongoose.model("User", userSchema);

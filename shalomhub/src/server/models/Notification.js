@@ -4,7 +4,7 @@ const NotificationSchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["like", "comment", "message", "friend"],
+      enum: ["like", "comment", "message", "friend", "friendRequest", "friendRequestAccepted"],
       required: true,
     },
     recipient: { 
@@ -21,7 +21,7 @@ const NotificationSchema = new mongoose.Schema(
     },
     relatedObjectType: {
       type: String,
-      enum: ["post", "comment", "message"],
+      enum: ["post", "comment", "message", "user"],
     },
     message: { 
       type: String, 

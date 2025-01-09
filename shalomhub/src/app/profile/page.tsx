@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useRouter } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
 
 interface Friend {
   _id: string;
@@ -21,6 +22,15 @@ interface ProfileData {
   friends: Friend[];
 }
 
+interface FriendRequest {
+  _id: string;
+  sender: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
+
 export default function Profile() {
   const [profile, setProfile] = useState<ProfileData>({
     firstName: "",
@@ -28,40 +38,88 @@ export default function Profile() {
     description: "",
     friends: [],
   });
+  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [newData, setNewData] = useState({
     firstName: "",
     lastName: "",
     description: "",
   });
-
-  const userEmail = localStorage.getItem("userEmail");
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!userEmail) {
-        console.error("No email found in localStorage");
-        return;
+    if (typeof window !== "undefined") {
+      const email = localStorage.getItem("userEmail");
+      const userId = localStorage.getItem("userId");
+      if (email && userId) {
+        setUserEmail(email);
+        setUserId(userId);
+      } else {
+        console.error("User email or ID is missing in localStorage");
       }
+    }
+  }, []);
 
+  useEffect(() => {
+    if (!userEmail || !userId) return;
+
+    const fetchProfileAndRequests = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/profile", {
-          params: { email: userEmail },
+        const [profileResponse, requestsResponse] = await Promise.all([
+          axios.get("http://localhost:3001/api/profile", {
+            params: { email: userEmail },
+          }),
+          axios.get(`http://localhost:3001/api/profile/${userId}/friend-requests`),
+        ]);
+        setProfile({
+          ...profileResponse.data,
+          friends: profileResponse.data.friends || [],
         });
 
-        setProfile({
-          ...response.data,
-          friends: response.data.friends || [],
-        });
+        setFriendRequests(requestsResponse.data.receivedRequests || []);
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error("Error fetching profile or friend requests:", err);
       }
     };
 
-    fetchProfile();
-  }, [userEmail]);
+    fetchProfileAndRequests();
+  }, [userEmail, userId]);
 
+  const handleAcceptRequest = async (requestId: string, friendEmail: string) => {
+    try {      
+      const response = await axios.put("http://localhost:3001/api/profile/friend-request/accept", {
+        userId,
+        friendEmail,
+      });
+      
+      setFriendRequests(prev => prev.filter(req => req._id !== requestId));
+  
+      const updatedProfile = await axios.get("http://localhost:3001/api/profile", {
+        params: { email: userEmail },
+      });
+      
+      setProfile(updatedProfile.data);
+  
+    } catch (err) {
+      console.error("Error accepting friend request:", err);
+    }
+  };
+  
+  const handleRejectRequest = async (requestId: string, friendEmail: string) => {
+    try {
+      
+      const response = await axios.delete("http://localhost:3001/api/profile/friend-request/reject", {
+        data: { userId, friendEmail },
+      });
+    
+      setFriendRequests(prev => prev.filter(req => req._id !== requestId));
+    } catch (err) {
+      console.error("Error rejecting friend request:", err);
+    }
+  };
+  
   const handleEdit = () => {
     setIsEditing(true);
     setNewData({
@@ -76,18 +134,18 @@ export default function Profile() {
       console.error("No email found in localStorage");
       return;
     }
-  
+
     try {
-      const response = await axios.put(
-        "http://localhost:3001/api/profile",
-        { ...newData, email: userEmail }
-      );
-  
+      const response = await axios.put("http://localhost:3001/api/profile", {
+        ...newData,
+        email: userEmail,
+      });
+
       setProfile({
         ...response.data.user,
         friends: profile.friends,
       });
-  
+
       setIsEditing(false);
     } catch (err) {
       console.error("Error updating profile:", err);
@@ -95,8 +153,11 @@ export default function Profile() {
   };
 
   const handleGoToFriendProfile = (friendEmail: string) => {
-    // dekodowanie - problem ze znakami specjalnymi w adresie
     router.push(`/userProfile/${encodeURIComponent(friendEmail)}`);
+  };
+
+  const handleGoToRequestProfile = (senderEmail: string) => {
+    router.push(`/userProfile/${encodeURIComponent(senderEmail)}`);
   };
 
   return (
@@ -108,42 +169,30 @@ export default function Profile() {
           {isEditing ? (
             <div className="space-y-6">
               <div>
-                <label className="block text-lg font-medium text-gray-700">
-                  First Name
-                </label>
+                <label className="block text-lg font-medium text-gray-700">First Name</label>
                 <input
                   type="text"
                   value={newData.firstName}
-                  onChange={(e) =>
-                    setNewData({ ...newData, firstName: e.target.value })
-                  }
+                  onChange={(e) => setNewData({ ...newData, firstName: e.target.value })}
                   placeholder="Enter first name"
                   className="w-full px-4 py-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-lg font-medium text-gray-700">
-                  Last Name
-                </label>
+                <label className="block text-lg font-medium text-gray-700">Last Name</label>
                 <input
                   type="text"
                   value={newData.lastName}
-                  onChange={(e) =>
-                    setNewData({ ...newData, lastName: e.target.value })
-                  }
+                  onChange={(e) => setNewData({ ...newData, lastName: e.target.value })}
                   placeholder="Enter last name"
                   className="w-full px-4 py-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-lg font-medium text-gray-700">
-                  Description
-                </label>
+                <label className="block text-lg font-medium text-gray-700">Description</label>
                 <textarea
                   value={newData.description}
-                  onChange={(e) =>
-                    setNewData({ ...newData, description: e.target.value })
-                  }
+                  onChange={(e) => setNewData({ ...newData, description: e.target.value })}
                   placeholder="Write a short description"
                   className="w-full px-4 py-3 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -180,27 +229,58 @@ export default function Profile() {
             </div>
           )}
 
+          <h2 className="text-2xl font-semibold text-gray-800 mt-8">Friend Requests</h2>
+          <ul className="mt-4 space-y-4">
+            {friendRequests && friendRequests.length > 0 ? (
+              friendRequests.map((request) => (
+                <li
+                  key={uuidv4()}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                >
+                  <div>
+                    <span className="text-lg text-gray-700 font-semibold">
+                      {request.sender.firstName} {request.sender.lastName}
+                    </span>
+                  </div>
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => handleAcceptRequest(request._id, request.sender.email)}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => handleRejectRequest(request._id, request.sender.email)}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p className="text-lg text-gray-500">No friend requests.</p>
+            )}
+          </ul>
+
           <h2 className="text-2xl font-semibold text-gray-800 mt-8">Friends</h2>
           <ul className="mt-4 space-y-4">
             {profile.friends && profile.friends.length > 0 ? (
               profile.friends.map((friend) => (
                 <li
-                  key={friend._id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-all"
-                  onClick={() => handleGoToFriendProfile(friend.email)}
+                  key={uuidv4()}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
-                      {friend.firstName[0]}{friend.lastName[0]}
-                    </div>
-                    <span className="text-lg text-gray-700 font-semibold">
-                      {friend.firstName} {friend.lastName}
-                    </span>
+                  <div
+                    onClick={() => handleGoToFriendProfile(friend.email)}
+                    className="cursor-pointer text-lg text-gray-700 font-semibold"
+                  >
+                    {friend.firstName} {friend.lastName}
                   </div>
                 </li>
               ))
             ) : (
-              <p className="text-lg text-gray-500">No friends found.</p>
+              <p className="text-lg text-gray-500">No friends yet.</p>
             )}
           </ul>
         </div>
