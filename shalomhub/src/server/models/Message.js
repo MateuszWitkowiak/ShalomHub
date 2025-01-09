@@ -7,14 +7,6 @@ const messageSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now },
 });
 
-// Dodanie przed-zapisowej walidacji -- błąd z typami 
-messageSchema.pre("save", function (next) {
-    if (!this.sender || !this.receiver || !this.text) {
-        return next(new Error("Brakuje wymaganych pól w wiadomości."));
-    }
-    next();
-});
-
 const Message = mongoose.model("Message", messageSchema);
 
 module.exports = Message;
