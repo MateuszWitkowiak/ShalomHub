@@ -2,6 +2,7 @@
 import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import { useState, useEffect, useRef } from "react";
+import Loader from "../components/Loader";
 import ProtectedRoute from "../components/ProtectedRoute";
 import SearchBar from "./components/searchbar";
 import axios from "axios";
@@ -31,10 +32,12 @@ export default function Homepage() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [postToEdit, setPostToEdit] = useState<Post | null>(null);
   const commentInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        setLoading(true)
         const response = await axios.get("http://localhost:3001/api/posts/getAll");
         setPosts(response.data);
       } catch (err) {
@@ -42,6 +45,7 @@ export default function Homepage() {
       }
     };
     fetchPosts();
+    setLoading(false);
   }, []);
 
   const handleLike = async (postId: string) => {
@@ -124,7 +128,6 @@ export default function Homepage() {
 
   const handleEdit = (postId: string, newDescription: string) => {
     const userEmail = localStorage.getItem("userEmail");
-
     if (!userEmail) {
       alert("Please log in to edit posts");
       return;
@@ -143,7 +146,7 @@ export default function Homepage() {
       alert("Please log in to save edits");
       return;
     }
-
+    setLoading(true)
     try {
       const response = await axios.put(`http://localhost:3001/api/posts/edit/${postToEdit._id}`, {
         description: newDescription,
@@ -161,6 +164,7 @@ export default function Homepage() {
     } catch (error) {
       console.error("Error editing post:", error);
     }
+    setLoading(false)
   };
 
   const handleDelete = async (postId: string) => {
@@ -192,6 +196,7 @@ export default function Homepage() {
         <Header />
         <SearchBar />
         <div className="p-5">
+          {loading && <Loader />}
           <h1 className="text-4xl font-semibold mb-8 text-center text-gray-800">Posts</h1>
 
           <div

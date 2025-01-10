@@ -2,6 +2,7 @@
 import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
+import Loader from "../components/Loader";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
@@ -11,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function AddPost() {
   const [description, setDescription] = useState("");
   const [email, setEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
   const router = useRouter();
 
   useEffect(() => {
@@ -25,6 +27,7 @@ export default function AddPost() {
   };
 
   const handleAddPost = async () => {
+    setLoading(true)
     if (!email) {
       toast.error("User is not logged in");
       setTimeout(() => {
@@ -38,7 +41,7 @@ export default function AddPost() {
         description,
         email,
       });
-
+      setLoading(false)
       toast.success("Post added successfully");
       setTimeout(() => {
         router.push("/home");
@@ -73,6 +76,7 @@ export default function AddPost() {
               >
                 Add Post
               </button>
+              {loading && <Loader />}
             </div>
           )}
         </div>
