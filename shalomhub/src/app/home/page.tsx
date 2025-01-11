@@ -7,6 +7,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import SearchBar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Comment {
   userId: string;
@@ -126,6 +128,13 @@ export default function Homepage() {
     }
   };
 
+  const handleKeyPressEdit = (event: React.KeyboardEvent, description: string) => {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      handleSaveEdit(description)
+    }
+  }
+
   const handleEdit = (postId: string, newDescription: string) => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) {
@@ -146,6 +155,17 @@ export default function Homepage() {
       alert("Please log in to save edits");
       return;
     }
+
+    if (newDescription === "") {
+      toast.error("Post must have description!", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true
+      })
+      return;
+    }
     setLoading(true)
     try {
       const response = await axios.put(`http://localhost:3001/api/posts/edit/${postToEdit._id}`, {
@@ -160,9 +180,23 @@ export default function Homepage() {
           post._id === updatedPost._id ? updatedPost : post
         )
       );
+      toast.success("Post successfully edited!", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+      })
       setEditModalVisible(false);
     } catch (error) {
       console.error("Error editing post:", error);
+      toast.error("Error editing post, try again.", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+      })
     }
     setLoading(false)
   };
@@ -184,16 +218,30 @@ export default function Homepage() {
 
       setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
 
-      alert("Post deleted successfully!");
+      toast.success("Post deleted succesfully!", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true
+      })
     } catch (error) {
-      console.error("Error deleting post:", error);
+      toast.error("Error deleting post.", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true
+      })
+      console.log(error)
     }
   };
 
   return (
     <DefaultLayout>
       <ProtectedRoute>
-        <Header />
+        <ToastContainer />
+        <Header />  
         <SearchBar />
         <div className="p-5">
           {loading && <Loader />}
@@ -358,6 +406,9 @@ export default function Homepage() {
                   className="w-full p-2 border border-gray-300 rounded-md mt-4"
                   rows={4}
                   onChange={(e) => setPostToEdit(prev => prev ? { ...prev, description: e.target.value } : prev)}
+                  onKeyDown={(event) => {
+                    handleKeyPressEdit(event, postToEdit.description)
+                  }}
                 ></textarea>
                 <button
                   onClick={() => handleSaveEdit(postToEdit.description)}
