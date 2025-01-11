@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 interface Friend {
   _id: string;
@@ -92,9 +93,15 @@ export default function Chat() {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") { 
+      event.preventDefault()
+      sendMessage()
+    }
+  }
+
   const sendMessage = async () => {
     if (!selectedFriend || !newMessage || !userId || !roomId) {
-      console.error("Required data is missing to send the message!");
       return;
     }
 
@@ -162,7 +169,7 @@ export default function Chat() {
         <div className="w-full h-screen bg-gradient-to-tl from-[#e0f7fa] to-[#0288d1]">
           <div className="flex h-full">
             {/* Lista znajomych -- PRZENIEŚĆ POTEM DO KOMPONENTU */}
-            <div className="w-1/4 bg-white p-6 shadow-lg rounded-lg m-4">
+            <div className="w-1/4 bg-white p-6 shadow-lg rounded-lg m-4 h-[80vh] overflow-y-auto">
               <h2 className="text-2xl font-semibold text-gray-700 mb-6">Friends</h2>
               <ul>
                 {friends.map((friend) => (
@@ -215,6 +222,7 @@ export default function Chat() {
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a message..."
+                      onKeyDown={handleKeyPress}
                       className="w-full p-4 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                     />
                     <button

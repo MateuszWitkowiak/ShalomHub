@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Loader from '../components/Loader'
@@ -15,6 +15,13 @@ export default function Register() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false)
     const router = useRouter();
+
+    const handleKeyPress = (event: React.KeyboardEvent) => {
+        if (event.key === "Enter") { 
+            event.preventDefault()
+            handleSubmit(event)
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,7 +59,7 @@ export default function Register() {
     };
 
     return (
-        <div className="h-screen flex justify-between flex-col">
+        <div className="h-screen flex justify-between flex-col overflow-x-hidden">
             <ToastContainer />
             {loading && <Loader />}
             {/* Górny róg */}
@@ -73,6 +80,7 @@ export default function Register() {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         placeholder="First name"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
 
@@ -81,6 +89,7 @@ export default function Register() {
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         placeholder="Last name"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
 
@@ -89,6 +98,7 @@ export default function Register() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e-mail"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
 
@@ -97,6 +107,7 @@ export default function Register() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="password"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
 
@@ -105,6 +116,7 @@ export default function Register() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="confirm password"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
 

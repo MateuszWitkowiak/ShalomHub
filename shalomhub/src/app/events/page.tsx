@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Event {
   _id: string;
@@ -35,6 +37,13 @@ export default function EventsPage() {
     }
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      handleCreateEvent()
+    }
+  }
+
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -46,8 +55,25 @@ export default function EventsPage() {
       return;
     }
 
+    if (!newEvent.title || !newEvent.description || !newEvent.date || !newEvent.location) {
+      toast.error("Please fill all the fields to create an event.", {
+        position: 'top-right',
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+      })
+      return;
+    }
+
     if (new Date(newEvent.date) < new Date()) {
-      alert("Cannot create an event in the past.");
+      toast.error("You can't create an event with date in the past", {
+        position: 'top-right',
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+      });
       return;
     }
 
@@ -60,7 +86,13 @@ export default function EventsPage() {
       setNewEvent({ title: "", description: "", date: "", location: "" });
     } catch (err) {
       console.error("Error creating event:", err);
-      alert("Failed to create event.");
+      toast.error("Failed to create Event", {
+        position: 'top-right',
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        draggable: true,
+      })
     }
   };
 
@@ -103,6 +135,7 @@ export default function EventsPage() {
 
   return (
     <DefaultLayout>
+      <ToastContainer />
       <Header />
       <div className="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
         <h1 className="text-4xl font-bold mb-6">Events</h1>
@@ -113,18 +146,21 @@ export default function EventsPage() {
               type="text"
               placeholder="Title"
               value={newEvent.title}
+              onKeyDown={handleKeyPress}
               onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
             <textarea
               placeholder="Description"
               value={newEvent.description}
+              onKeyDown={handleKeyPress}
               onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
             <input
               type="date"
               value={newEvent.date}
+              onKeyDown={handleKeyPress}
               onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
@@ -132,6 +168,7 @@ export default function EventsPage() {
               type="text"
               placeholder="Location"
               value={newEvent.location}
+              onKeyDown={handleKeyPress}
               onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
               className="w-full p-3 border rounded-md"
             />

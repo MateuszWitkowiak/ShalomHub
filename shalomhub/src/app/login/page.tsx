@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Loader from '../components/Loader'
@@ -13,6 +13,12 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+    const handleKeyPress = (event: React.KeyboardEvent) => {
+        if (event.key === "Enter") {
+            event.preventDefault()
+            handleLogin(event)
+        }
+    }
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -72,6 +78,7 @@ export default function Login() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="e-mail"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3"
                     />
                     <input
@@ -79,6 +86,7 @@ export default function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="password"
+                        onKeyDown={handleKeyPress}
                         className="border border-gray-300 h-10 rounded-sm focus:border-gray-500 pl-3 text-xl placeholder:text-base"
                     />
                     {error && <p className="text-red-500 text-sm">{error}</p>}
