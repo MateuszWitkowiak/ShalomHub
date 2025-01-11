@@ -328,8 +328,16 @@ export default function Homepage() {
                 </button>
                 {posts.find(post => post._id === selectedPostId) ? (
                   <>
-                    <h2 className="text-xl font-semibold">
-                      {posts.find(post => post._id === selectedPostId)?.userId.email || "Anonymous"}
+                   <h2 className="text-xl font-semibold">
+                      <Link 
+                        href={
+                          posts.find(post => post._id === selectedPostId)?.userId.email === localStorage.getItem("userEmail") 
+                            ? "/profile" 
+                            : `/userProfile/${posts.find(post => post._id === selectedPostId)?.userId.email}`
+                        }
+                      >
+                        {posts.find(post => post._id === selectedPostId)?.userId.email || "Anonymous"}
+                      </Link>
                     </h2>
                     <p className="text-gray-600">{posts.find(post => post._id === selectedPostId)?.description}</p>
                     <p className="text-sm text-gray-500 mt-2">

@@ -7,6 +7,8 @@ import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Friend {
   _id: string;
@@ -62,6 +64,19 @@ export default function Profile() {
     }
   }, []);
 
+  const validateData = () => {
+    if (!newData.firstName.trim()) {
+      toast.error("First name cannot be empty.");
+      return false;
+    }
+    if (!newData.lastName.trim()) {
+      toast.error("Last name cannot be empty.");
+      return false;
+    }
+    return true;
+  };
+  
+
   useEffect(() => {
     if (!userEmail || !userId) return;
 
@@ -99,7 +114,10 @@ export default function Profile() {
       const updatedProfile = await axios.get("http://localhost:3001/api/profile", {
         params: { email: userEmail },
       });
-      
+      toast.success("Friend Added successfully", {
+        autoClose: 1500,
+        hideProgressBar: true,
+      })
       setProfile(updatedProfile.data);
   
     } catch (err) {
@@ -135,6 +153,10 @@ export default function Profile() {
       return;
     }
 
+    if (!validateData()){
+      return;
+    }
+
     try {
       const response = await axios.put("http://localhost:3001/api/profile", {
         ...newData,
@@ -147,6 +169,10 @@ export default function Profile() {
       });
 
       setIsEditing(false);
+      toast.success("Profile edited successfully!", {
+        autoClose: 1500,
+        hideProgressBar: true,
+      })
     } catch (err) {
       console.error("Error updating profile:", err);
     }
@@ -163,6 +189,7 @@ export default function Profile() {
   return (
     <DefaultLayout>
       <ProtectedRoute>
+        <ToastContainer />
         <Header />
         <div className="max-w-4xl mx-auto mt-16 p-6 bg-white shadow-md rounded-lg">
           <h1 className="text-4xl font-bold text-gray-800 mb-6">Profile</h1>
