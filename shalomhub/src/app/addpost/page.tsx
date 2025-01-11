@@ -2,7 +2,8 @@
 import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
-import { useState, useEffect } from "react";
+import Loader from "../components/Loader";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
@@ -11,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function AddPost() {
   const [description, setDescription] = useState("");
   const [email, setEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
   const router = useRouter();
 
   useEffect(() => {
@@ -24,7 +26,14 @@ export default function AddPost() {
     setDescription(e.target.value);
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter"){
+      event.preventDefault()
+      handleAddPost()
+    }
+  }
   const handleAddPost = async () => {
+    setLoading(true)
     if (!email) {
       toast.error("User is not logged in");
       setTimeout(() => {
@@ -38,7 +47,7 @@ export default function AddPost() {
         description,
         email,
       });
-
+      setLoading(false)
       toast.success("Post added successfully");
       setTimeout(() => {
         router.push("/home");
@@ -61,6 +70,7 @@ export default function AddPost() {
               className="w-full h-36 p-4 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               placeholder="Enter your description"
               value={description}
+              onKeyDown={handleKeyPress}
               onChange={handleDescriptionChange}
             />
           </div>
@@ -73,6 +83,7 @@ export default function AddPost() {
               >
                 Add Post
               </button>
+              {loading && <Loader />}
             </div>
           )}
         </div>
