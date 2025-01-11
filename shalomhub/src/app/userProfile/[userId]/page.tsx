@@ -59,7 +59,7 @@ export default function UserProfile() {
         setFriendRequestStatus(friendRequestResponse.data.status);
 
         const friendsList = response.data.friends;
-        const isAlreadyFriend = friendsList.some(friend => friend.email === currentUserEmail);
+        const isAlreadyFriend = friendsList.some((friend: Friend) => friend.email === currentUserEmail);
         setIsFriend(isAlreadyFriend);
       } catch (error) {
         console.error("Error fetching user profile or friend request status:", error);
@@ -138,16 +138,23 @@ export default function UserProfile() {
       <ProtectedRoute>
         <Header />
         <div className="max-w-4xl mx-auto mt-16 p-6 bg-white shadow-lg rounded-lg">
-          <h1 className="text-4xl font-semibold text-gray-800 mb-4">
+        <h1 className="text-4xl font-semibold text-gray-800 mb-4 flex items-center space-x-4">
+          <span>
             {profile.firstName} {profile.lastName}
-          </h1>
+          </span>
+          {isFriend && (
+            <div className="px-3 py-1 bg-green-500 text-white text-sm rounded-md mt-1">
+              Friend
+            </div>
+          )}
+        </h1>
           <p className="text-lg text-gray-700 mb-6">{profile.description}</p>
 
-          <div className="mt-6">
+          <div className="mt-6 justify-items-center">
             {friendRequestStatus === "none" && !isFriend && (
               <button
                 onClick={handleSendFriendRequest}
-                className="w-full flex items-center justify-center space-x-2 p-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all"
+                className="w-1/4 flex items-center justify-center space-x-2 p-3 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all"
               >
                 <span>Send Friend Request</span>
               </button>
@@ -155,7 +162,7 @@ export default function UserProfile() {
             {friendRequestStatus === "pending" && !isFriend && (
               <button
                 disabled
-                className="w-full flex items-center justify-center space-x-2 p-3 bg-yellow-500 text-white rounded-md"
+                className="w-1/4 flex items-center justify-center space-x-2 p-3 bg-yellow-500 text-white rounded-md"
               >
                 <span>Request Pending</span>
               </button>
@@ -163,7 +170,7 @@ export default function UserProfile() {
             {friendRequestStatus === "received" && !isFriend && (
               <button
                 disabled
-                className="w-full flex items-center justify-center space-x-2 p-3 bg-purple-500 text-white rounded-md"
+                className="w-1/4 flex items-center justify-center space-x-2 p-3 bg-purple-500 text-white rounded-md"
               >
                 <span>Request Received</span>
               </button>
@@ -171,7 +178,7 @@ export default function UserProfile() {
             {isFriend && (
               <button
                 onClick={handleRemoveFriend}
-                className="w-full flex items-center justify-center space-x-2 p-3 bg-red-500 text-white rounded-md hover:bg-red-700 transition-all"
+                className="w-1/4 flex items-center justify-center space-x-2 p-3 bg-red-500 text-white rounded-md hover:bg-red-700 transition-all"
               >
                 <span>Remove from Friends</span>
               </button>
