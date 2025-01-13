@@ -7,7 +7,7 @@ import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useRouter } from "next/navigation";
-import { Friend, Message } from "./components/types";
+import { Friend, Message } from "./types";
 import FriendList from "./components/FriendList";
 import ChatBox from "./components/ChatBox";
 import MessageInput from "./components/MessageInput";
@@ -172,6 +172,7 @@ export default function Chat() {
                     userId={userId!}
                     formatTime={formatTime}
                   />
+                  <div ref={chatEndRef} />
                   <MessageInput
                     newMessage={newMessage}
                     setNewMessage={setNewMessage}

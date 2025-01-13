@@ -7,7 +7,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import SearchBar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
-import { Post, Comment } from "./components/types"
+import { Post, Comment } from "./types"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

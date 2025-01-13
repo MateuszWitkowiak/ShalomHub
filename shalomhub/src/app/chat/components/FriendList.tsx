@@ -1,4 +1,4 @@
-import { Friend } from "./types";
+import { Friend } from "../types";
 
 interface FriendListProps {
   friends: Friend[];

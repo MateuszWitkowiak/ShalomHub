@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import EventList from "./components/EventList";
 import EventForm from "./components/EventForm";
 import EventModal from "./components/EventModal";
-import { Event } from "./components/types";
+import { Event } from "./types";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);

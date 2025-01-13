@@ -1,4 +1,4 @@
-import { EventListProps } from "./types";
+import { EventListProps } from "../types";
 const EventList: React.FC<EventListProps> = ({
   events,
   toggleAttendEvent,

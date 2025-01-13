@@ -1,4 +1,4 @@
-import { EventFormProps } from "./types";
+import { EventFormProps } from "../types";
 const EventForm: React.FC<EventFormProps> = ({
   newEvent,
   setNewEvent,

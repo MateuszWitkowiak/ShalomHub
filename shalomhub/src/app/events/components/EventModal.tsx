@@ -1,4 +1,4 @@
-import { EventModalProps } from "./types";
+import { EventModalProps } from "../types";
 
 const EventModal: React.FC<EventModalProps> = ({ attendees, closeModal }) => (
   <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
