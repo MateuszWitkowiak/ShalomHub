@@ -5,11 +5,12 @@ import axios from "axios";
 import Header from "../components/Header";
 import DefaultLayout from "../components/DefaultLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
-import { FriendRequest, Friend, ProfileData } from "./types";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import { ProfileData, Friend, FriendRequest } from "./types";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function Profile() {
   const [profile, setProfile] = useState<ProfileData>({
