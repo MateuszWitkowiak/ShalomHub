@@ -77,7 +77,8 @@ router.get('/searchUsers', async (req, res) => {
       $and: queryParts.map(part => ({
         $or: [
           { firstName: { $regex: part, $options: 'i' } },
-          { lastName: { $regex: part, $options: 'i' } }
+          { lastName: { $regex: part, $options: 'i' } },
+          { email: {$regex: part, $options: 'i'} }
         ]
       }))
     }).select('firstName lastName email');
