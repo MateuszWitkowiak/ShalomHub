@@ -7,24 +7,9 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import SearchBar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
+import { Post, Comment } from "./components/types"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-interface Comment {
-  userId: string;
-  text: string;
-  createdAt: string;
-}
-
-interface Post {
-  _id: string;
-  description: string;
-  userId: { email: string };
-  createdAt: string;
-  comments: Comment[];
-  likesCount: number;
-  likedBy: string[];
-}
 
 export default function Homepage() {
   const [posts, setPosts] = useState<Post[]>([]);
