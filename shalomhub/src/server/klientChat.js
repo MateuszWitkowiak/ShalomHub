@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const apiUrl = "http://localhost:3001";
+const apiUrl = "http://localhost:3001/api/chat";
 
 // pobieranie wiadomosci dla danego pokoju (konwersacji)
 async function fetchMessagesForRoom(roomId) {
@@ -19,3 +19,5 @@ async function fetchMessagesForRoom(roomId) {
     return [];
   }
 }
+
+export default fetchMessagesForRoom
