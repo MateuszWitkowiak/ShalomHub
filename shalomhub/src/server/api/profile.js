@@ -4,6 +4,7 @@ const Notification = require('../models/Notification');
 const router = express.Router();
 const { io } = require("../server");
 
+// pobieranie profilu
 router.get('/', async (req, res) => {
   const userEmail = req.query.email;
 
@@ -31,6 +32,7 @@ router.get('/', async (req, res) => {
   }
 });
 
+// edytowanie profilu 
 router.put('/', async (req, res) => {
   const { email, firstName, lastName, description } = req.body;
 
@@ -64,6 +66,7 @@ router.put('/', async (req, res) => {
   }
 });
 
+// wyszukiwanie użytkownika po regexie
 router.get('/searchUsers', async (req, res) => {
   const { query } = req.query;
 
@@ -90,6 +93,7 @@ router.get('/searchUsers', async (req, res) => {
   }
 });
 
+// obsługa friend requestów
 router.post('/friendRequests', async (req, res) => {
   const { senderEmail, receiverEmail } = req.body;
 
@@ -153,6 +157,7 @@ router.post('/friendRequests', async (req, res) => {
   }
 });
 
+// akceptowanie friendRequesta
 router.put('/friend-request/accept', async (req, res) => {
   const { userId, friendEmail } = req.body;
 
@@ -216,6 +221,7 @@ router.put('/friend-request/accept', async (req, res) => {
 });
 
 
+// usuwanie friendRequesta
 router.delete('/friend-request/reject', async (req, res) => {
   const { userId, friendEmail } = req.body;
 
@@ -257,6 +263,7 @@ router.delete('/friend-request/reject', async (req, res) => {
   }
 });
 
+// Pobieranie friendRequestów danego użytkownika
 router.get('/:userId/friend-requests', async (req, res) => {
   const { userId } = req.params;
   try {
@@ -280,7 +287,7 @@ router.get('/:userId/friend-requests', async (req, res) => {
 });
 
 
-
+// pobieranie statusu friendRequesta danego
 router.get('/friendRequests/status/:userId', async (req, res) => {
   const { userId } = req.params;
   const { friendEmail } = req.query;
@@ -314,6 +321,7 @@ router.get('/friendRequests/status/:userId', async (req, res) => {
   }
 });
 
+// usuwanie znajomego
 router.post('/removeFriend', async (req, res) => {
   const { userEmail, friendEmail } = req.body;
 

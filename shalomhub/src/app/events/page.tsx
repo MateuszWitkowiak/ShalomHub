@@ -39,6 +39,30 @@ export default function EventsPage() {
     }
   };
 
+  const handleDeleteButton = async (eventId: string) => {
+    console.log(eventId)
+    try {
+      const response = await axios.delete(`http://localhost:3001/api/events/${eventId}/delete`);
+      if (response.status === 200) {
+        setEvents((prevEvents) => prevEvents.filter(event => event._id !== eventId));
+        toast.success("Event deleted successfully!", {
+          position: "top-right",
+          autoClose: 1500,
+          hideProgressBar: true,
+          closeOnClick: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Failed to delete the event.", {
+        position: "top-right",
+        autoClose: 1500,
+        hideProgressBar: true,
+        closeOnClick: true,
+      });
+    }
+  }
+
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -145,6 +169,7 @@ export default function EventsPage() {
           events={events}
           toggleAttendEvent={toggleAttendEvent}
           openParticipantsModal={openParticipantsModal}
+          handleDeleteButton={handleDeleteButton}
         />
       </div>
       {showModal && (

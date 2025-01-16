@@ -4,6 +4,7 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const router = express.Router();
 
+// tworzenie eventu
 router.post("/", async (req, res) => {
   try {
     const { title, description, date, location, createdBy } = req.body;
@@ -20,6 +21,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// pobieranie eventów
 router.get("/", async (req, res) => {
   try {
     const events = await Event.find().populate("createdBy", "firstName lastName");
@@ -29,6 +31,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//dołączanie do eventu
 router.post("/:id/attend", async (req, res) => {
   try {
 
@@ -67,5 +70,22 @@ router.post("/:id/attend", async (req, res) => {
     res.status(500).send({ message: "Error attending event", error: err });
   }
 });
+
+// usunięcie eventu
+router.delete("/:id/delete", async (req,res) => {
+  try {
+    const { id } = req.params
+    const foundEvent = await Event.findById(id)
+    if (!foundEvent){
+      return res.status(404).json({ error: "Event not found" });
+    }
+  
+    await foundEvent.deleteOne();
+    res.status(200).json({message: "Event deleted successfully"})
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).json({ error: "Internal Server Error"});
+  }
+})
 
 module.exports = router;

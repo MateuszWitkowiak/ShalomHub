@@ -35,4 +35,16 @@ async function attendEvent(eventId, userId) {
   }
 }
 
-export { createEvent, getEvents, attendEvent };
+// Usuwanie wydarzenia
+async function deleteEvent(eventId){
+  try {
+    const response = await axios.delete(`${API_URL}/${eventId}/delete`)
+    console.log(`EventId: ${eventId} succesfully deleted!`)
+    return response.data
+  } catch (error) {
+    console.error("Error deleting event:", error.message)
+    throw error
+  }
+}
+
+export { createEvent, getEvents, attendEvent, deleteEvent };

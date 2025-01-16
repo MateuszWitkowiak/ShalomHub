@@ -155,10 +155,7 @@ export default function Chat() {
         <Header />
         <div className="w-full h-screen bg-gradient-to-tl from-[#e0f7fa] to-[#0288d1]">
           <div className="flex h-full">
-            {/* Lista znajomych */}
             <FriendList friends={friends} onFriendClick={handleFriendClick} />
-
-            {/* Cały chat */}
             <div className="w-3/4 bg-white p-8 shadow-xl rounded-lg m-4 flex flex-col">
               {selectedFriend ? (
                 <>
