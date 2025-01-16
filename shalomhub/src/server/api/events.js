@@ -4,6 +4,7 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const router = express.Router();
 
+// tworzenie eventu
 router.post("/", async (req, res) => {
   try {
     const { title, description, date, location, createdBy } = req.body;
@@ -20,6 +21,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// pobieranie eventów
 router.get("/", async (req, res) => {
   try {
     const events = await Event.find().populate("createdBy", "firstName lastName");
@@ -29,6 +31,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//dołączanie do eventu
 router.post("/:id/attend", async (req, res) => {
   try {
 
@@ -68,6 +71,7 @@ router.post("/:id/attend", async (req, res) => {
   }
 });
 
+// usunięcie eventu
 router.delete("/:id/delete", async (req,res) => {
   try {
     const { id } = req.params
