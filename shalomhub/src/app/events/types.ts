@@ -5,12 +5,14 @@ export interface Event {
     date: string;
     location: string;
     attendees: string[];
+    createdBy: string;
 }
 
 export interface EventListProps {
   events: Event[];
   toggleAttendEvent: (eventId: string) => void;
   openParticipantsModal: (attendees: string[]) => void;
+  handleDeleteButton: (eventId: string) => void;
 }
 
 export interface EventModalProps {

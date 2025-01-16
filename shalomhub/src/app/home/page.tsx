@@ -8,6 +8,8 @@ import SearchBar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
 import { Post, Comment } from "./types"
+import DeleteModal from "./components/deleteModal";
+import EditModal from "./components/editModal";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -20,6 +22,8 @@ export default function Homepage() {
   const [postToEdit, setPostToEdit] = useState<Post | null>(null);
   const commentInputRef = useRef<HTMLTextAreaElement | null>(null);
   const [loading, setLoading] = useState(false)
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+  const [postToDelete, setPostToDelete] = useState<Post | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -194,8 +198,6 @@ export default function Homepage() {
       return;
     }
 
-    if (!confirm("Are you sure you want to delete this post?")) return;
-
     try {
       await axios.delete(`http://localhost:3001/api/posts/delete/${postId}`, {
         data: { userEmail },
@@ -222,6 +224,16 @@ export default function Homepage() {
     }
   };
 
+  const openDeleteModal = (post: Post) => {
+    setPostToDelete(post);
+    setDeleteModalVisible(true);
+  };
+  
+  const closeDeleteModal = () => {
+    setDeleteModalVisible(false);
+    setPostToDelete(null);
+  };
+    
   return (
     <DefaultLayout>
       <ProtectedRoute>
@@ -283,7 +295,7 @@ export default function Homepage() {
                         className="text-red-500 hover:text-red-700"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDelete(post._id);
+                          openDeleteModal(post);
                         }}
                       >
                         Delete
@@ -378,39 +390,19 @@ export default function Homepage() {
           )}
 
           {editModalVisible && postToEdit && (
-            <div
-              className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  setEditModalVisible(false);
-                }
-              }}
-            >
-              <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/3">
-                <button
-                  onClick={() => setEditModalVisible(false)}
-                  className="absolute top-2 right-2 text-xl font-bold text-gray-500 hover:text-gray-800 transition-all"
-                >
-                  ×
-                </button>
-                <h2 className="text-xl font-semibold">Edit Post</h2>
-                <textarea
-                  defaultValue={postToEdit.description}
-                  className="w-full p-2 border border-gray-300 rounded-md mt-4"
-                  rows={4}
-                  onChange={(e) => setPostToEdit(prev => prev ? { ...prev, description: e.target.value } : prev)}
-                  onKeyDown={(event) => {
-                    handleKeyPressEdit(event, postToEdit.description)
-                  }}
-                ></textarea>
-                <button
-                  onClick={() => handleSaveEdit(postToEdit.description)}
-                  className="mt-4 w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
+            <EditModal
+              postToEdit={postToEdit}
+              setEditModalVisible={setEditModalVisible}
+              setPosts={setPosts}
+            />
+          )}
+
+          {deleteModalVisible && postToDelete && (
+            <DeleteModal
+              postToDelete={postToDelete}
+              setDeleteModalVisible={setDeleteModalVisible}
+              setPosts={setPosts}
+            />
           )}
         </div>
       </ProtectedRoute>

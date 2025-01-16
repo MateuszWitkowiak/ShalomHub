@@ -5,6 +5,7 @@
   const { io } = require("../server")
   const Notification = require('../models/Notification');
   
+  // dodawanie posta
   router.post("/add", async (req, res) => {
     const { description, email } = req.body;
 
@@ -32,6 +33,7 @@
     }
   });
 
+  // pobieranie postów
   router.get("/getAll", async (req, res) => {
     try {
       const posts = await Post.find().populate("userId", "email");
@@ -42,6 +44,7 @@
     }
   });
 
+  // lajkowanie posta
   router.post("/like/:id", async (req, res) => {
     const { userEmail } = req.body;
     const postId = req.params.id;
@@ -94,7 +97,7 @@
     }
 });
 
-  
+  // komentowanie 
   router.post("/comment/:id", async (req, res) => {
     const { text, userId } = req.body;
   
@@ -150,6 +153,7 @@
     }
   });
   
+  // edytowanie
   router.put("/edit/:id", async (req, res) => {
     const { description, userEmail } = req.body;
     const postId = req.params.id;
@@ -185,6 +189,7 @@
     }
   });
 
+  // usuwanie wiadomości
   router.delete("/delete/:id", async (req, res) => {
     const { userEmail } = req.body;
     const postId = req.params.id;
@@ -217,6 +222,7 @@
     }
   });
 
+  // powiadomienia :)
   router.get("/notifications", async (req, res) => {
     const { userId, limit = 10, skip = 0 } = req.query;
   

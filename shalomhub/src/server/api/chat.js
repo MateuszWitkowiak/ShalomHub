@@ -7,6 +7,7 @@ const { io } = require("../server");
 
 const router = express.Router();
 
+// pobieranie wiadomości dla pokoju
 router.get("/messages/:roomId", async (req, res) => {
   const { roomId } = req.params;
 
@@ -24,6 +25,7 @@ router.get("/messages/:roomId", async (req, res) => {
   }
 });
 
+// tworzenie nowego pokoju
 router.post("/rooms", async (req, res) => {
   const { user1, user2 } = req.body;
 
@@ -54,6 +56,7 @@ router.post("/rooms", async (req, res) => {
   }
 });
 
+// wysyłanie wiadomości
 router.post("/sendMessage", async (req, res) => {
   const { roomId, text, senderId, receiverId } = req.body;
   if (!roomId || !text || !senderId || !receiverId) {
