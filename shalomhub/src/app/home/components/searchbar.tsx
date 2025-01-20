@@ -30,11 +30,7 @@ export default function SearchBar() {
       });
       setResults(response.data);
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Axios error:", error.response?.data);
-      } else {
-        console.error("Unexpected error:", error);
-      }
+      console.log(error)
     } finally {
       setLoading(false);
     }

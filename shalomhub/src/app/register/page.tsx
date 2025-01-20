@@ -70,7 +70,7 @@ export default function Register() {
             </div>
 
             {/* Formularz rejestracji */}
-            <div className="flex justify-center mt-[-4rem]">
+            <div className="flex justify-center mt-10">
                 <div className="w-96 flex flex-col space-y-5 card p-10">
                     <h1 className="text-4xl text-primary font-semibold">Join us</h1>
                     <hr />
