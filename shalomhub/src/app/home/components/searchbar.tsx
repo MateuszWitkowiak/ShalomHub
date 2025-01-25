@@ -25,7 +25,7 @@ export default function SearchBar() {
 
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:3001/api/profile/searchUsers", {
+      const response = await axios.get("https://localhost:3001/api/profile/searchUsers", {
         params: { query: value },
       });
       setResults(response.data);

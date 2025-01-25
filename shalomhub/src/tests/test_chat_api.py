@@ -16,7 +16,6 @@ class TestChatAPI(unittest.TestCase):
         mock_get.return_value.json.return_value = expected_response
 
         response = requests.get(f"{self.base_url}/messages/{room_id}")
-
         self.assertEqual(response.status_code, expected_status)
         self.assertEqual(response.json(), expected_response)
 

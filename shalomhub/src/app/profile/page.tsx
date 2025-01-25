@@ -62,10 +62,10 @@ export default function Profile() {
     const fetchProfileAndRequests = async () => {
       try {
         const [profileResponse, requestsResponse] = await Promise.all([
-          axios.get("http://localhost:3001/api/profile", {
+          axios.get("https://localhost:3001/api/profile", {
             params: { email: userEmail },
           }),
-          axios.get(`http://localhost:3001/api/profile/${userId}/friend-requests`),
+          axios.get(`https://localhost:3001/api/profile/${userId}/friend-requests`),
         ]);
         setProfile({
           ...profileResponse.data,
@@ -83,14 +83,14 @@ export default function Profile() {
 
   const handleAcceptRequest = async (requestId: string, friendEmail: string) => {
     try {      
-      const response = await axios.put("http://localhost:3001/api/profile/friend-request/accept", {
+      const response = await axios.put("https://localhost:3001/api/profile/friend-request/accept", {
         userId,
         friendEmail,
       });
       
       setFriendRequests(prev => prev.filter(req => req._id !== requestId));
   
-      const updatedProfile = await axios.get("http://localhost:3001/api/profile", {
+      const updatedProfile = await axios.get("https://localhost:3001/api/profile", {
         params: { email: userEmail },
       });
       toast.success("Friend Added successfully", {
@@ -107,7 +107,7 @@ export default function Profile() {
   const handleRejectRequest = async (requestId: string, friendEmail: string) => {
     try {
       
-      const response = await axios.delete("http://localhost:3001/api/profile/friend-request/reject", {
+      const response = await axios.delete("https://localhost:3001/api/profile/friend-request/reject", {
         data: { userId, friendEmail },
       });
     
@@ -137,7 +137,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await axios.put("http://localhost:3001/api/profile", {
+      const response = await axios.put("https://localhost:3001/api/profile", {
         ...newData,
         email: userEmail,
       });

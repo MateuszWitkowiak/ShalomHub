@@ -1,7 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const http = require("http");
+const fs = require("fs");
+const https = require("https");
 const socketIo = require("socket.io");
 
 const Message = require('./models/Message');
@@ -9,10 +10,13 @@ const Room = require('./models/Room');
 const User = require('./models/User')
 
 const app = express();
-const server = http.createServer(app);
+const privateKey = fs.readFileSync('/home/mwitkowiak/tls/private.key', 'utf8');
+const certificate = fs.readFileSync('/home/mwitkowiak/tls/certificate.crt', 'utf8');
+const server = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app);
+
 const io = socketIo(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: 'https://localhost:3000',
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization']
     }
@@ -21,7 +25,7 @@ const io = socketIo(server, {
 module.exports = { io };
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -103,5 +107,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(3001, () => {
-    console.log(`Server running on port 3001`);
+    console.log(`Server running on https://localhost:3001`);
 });

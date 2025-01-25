@@ -19,7 +19,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ postToDelete, setDeleteModalV
     }
 
     try {
-      await axios.delete(`http://localhost:3001/api/posts/delete/${postToDelete?._id}`, {
+      await axios.delete(`https://localhost:3001/api/posts/delete/${postToDelete?._id}`, {
         data: { userEmail },
       });
 

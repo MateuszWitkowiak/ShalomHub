@@ -35,7 +35,7 @@ const EditModal: React.FC<EditModalProps> = ({ postToEdit, setEditModalVisible, 
     }
 
     try {
-      const response = await axios.put(`http://localhost:3001/api/posts/edit/${postToEdit._id}`, {
+      const response = await axios.put(`https://localhost:3001/api/posts/edit/${postToEdit._id}`, {
         description,
         userEmail,
       });

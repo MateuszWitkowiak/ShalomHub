@@ -25,7 +25,7 @@ export default function Notifications() {
       }
     }
 
-    const socketConnection = io("http://localhost:3001");
+    const socketConnection = io("https://localhost:3001");
     setSocket(socketConnection);
 
     return () => {
@@ -55,7 +55,7 @@ export default function Notifications() {
     setLoading(true);
 
     axios
-      .get(`http://localhost:3001/api/posts/notifications`, {
+      .get(`https://localhost:3001/api/posts/notifications`, {
         params: { userId, limit: 10, skip },
       })
       .then((response) => {

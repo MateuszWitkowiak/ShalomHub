@@ -29,7 +29,7 @@ export default function Homepage() {
     const fetchPosts = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("http://localhost:3001/api/posts/getAll");
+        const response = await axios.get("https://localhost:3001/api/posts/getAll");
         setPosts(response.data);
       } catch (err) {
         console.log(err);
@@ -78,7 +78,6 @@ export default function Homepage() {
         { userId: userEmail, text }
       );
       const updatedPost = response.data;
-
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post._id === updatedPost._id ? updatedPost : post
