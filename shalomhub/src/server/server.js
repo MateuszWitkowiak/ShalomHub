@@ -12,7 +12,7 @@ const User = require('./models/User')
 const app = express();
 const privateKey = fs.readFileSync('/home/mwitkowiak/tls/private.key', 'utf8');
 const certificate = fs.readFileSync('/home/mwitkowiak/tls/certificate.crt', 'utf8');
-const server = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app);
+const server = https.createServer({ key: privateKey, cert: certificate }, app);
 
 const io = socketIo(server, {
     cors: {
@@ -105,6 +105,7 @@ io.on("connection", (socket) => {
         }
     });
 });
+
 
 server.listen(3001, () => {
     console.log(`Server running on https://localhost:3001`);
