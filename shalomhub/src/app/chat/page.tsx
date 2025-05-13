@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 import Header from "../components/Header";
@@ -21,10 +21,9 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [roomId, setRoomId] = useState<string | null>(null);
   const router = useRouter();
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null;
-  const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
+  const userEmail = localStorage.getItem("userEmail");
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -126,21 +125,12 @@ export default function Chat() {
         }
         return [...prevMessages, newMessage];
       });
-      if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-      }
     });
 
     return () => {
       socket.off("newMessage");
     };
   }, []);
-
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -169,7 +159,6 @@ export default function Chat() {
                     userId={userId!}
                     formatTime={formatTime}
                   />
-                  <div ref={chatEndRef} />
                   <MessageInput
                     newMessage={newMessage}
                     setNewMessage={setNewMessage}

@@ -1,9 +1,7 @@
-  const express = require("express");
-  const Post = require("../models/Post");
-  const User = require("../models/User");
-  const router = express.Router();
-  const { io } = require("../server")
-  const Notification = require('../models/Notification');
+  import Post from "../models/Post.js";
+  import User from "../models/User.js";
+  import { io } from "../server.js";
+  import Notification from "../models/Notification.js";
   
   // dodawanie posta
   router.post("/add", async (req, res) => {

@@ -1,7 +1,6 @@
-const express = require("express");
-const Event = require("../models/Event");
-const User = require("../models/User");
-const mongoose = require("mongoose");
+import express from "express";
+import Event from "../models/Event.js";
+import User from "../models/User.js";
 const router = express.Router();
 
 // tworzenie eventu

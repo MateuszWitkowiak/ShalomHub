@@ -7,10 +7,11 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import SearchBar from "./components/searchbar";
 import axios from "axios";
 import Link from "next/link";
-import { Post, Comment } from "./types"
+import { Post } from "./types"
 import DeleteModal from "./components/deleteModal";
 import EditModal from "./components/editModal";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
+import CommentModal from "./components/CommentModal";
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Homepage() {
@@ -68,7 +69,7 @@ export default function Homepage() {
     const userEmail = localStorage.getItem("userEmail");
 
     if (!userEmail) {
-      alert("Make sure you're logged in.");
+      alert("Please log in to comment on posts");
       return;
     }
 
@@ -108,23 +109,7 @@ export default function Homepage() {
     setSelectedPostId(null);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (commentText.trim()) {
-        handleComment(selectedPostId!, commentText);
-      }
-    }
-  };
-
-  const handleKeyPressEdit = (event: React.KeyboardEvent, description: string) => {
-    if (event.key === "Enter") {
-      event.preventDefault()
-      handleSaveEdit(description)
-    }
-  }
-
-  const handleEdit = (postId: string, newDescription: string) => {
+  const handleEdit = (postId: string) => {
     const userEmail = localStorage.getItem("userEmail");
     if (!userEmail) {
       alert("Please log in to edit posts");
@@ -135,103 +120,9 @@ export default function Homepage() {
     setEditModalVisible(true);
   };
 
-  const handleSaveEdit = async (newDescription: string) => {
-    if (!postToEdit) return;
-
-    const userEmail = localStorage.getItem("userEmail");
-
-    if (!userEmail) {
-      alert("Please log in to save edits");
-      return;
-    }
-
-    if (newDescription === "") {
-      toast.error("Post must have description!", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        draggable: true
-      })
-      return;
-    }
-    setLoading(true)
-    try {
-      const response = await axios.put(`http://localhost:3001/api/posts/edit/${postToEdit._id}`, {
-        description: newDescription,
-        userEmail,
-      });
-
-      const updatedPost = response.data;
-
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post._id === updatedPost._id ? updatedPost : post
-        )
-      );
-      toast.success("Post successfully edited!", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        draggable: true,
-      })
-      setEditModalVisible(false);
-    } catch (error) {
-      console.error("Error editing post:", error);
-      toast.error("Error editing post, try again.", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        draggable: true,
-      })
-    }
-    setLoading(false)
-  };
-
-  const handleDelete = async (postId: string) => {
-    const userEmail = localStorage.getItem("userEmail");
-
-    if (!userEmail) {
-      alert("Please log in to delete posts");
-      return;
-    }
-
-    try {
-      await axios.delete(`http://localhost:3001/api/posts/delete/${postId}`, {
-        data: { userEmail },
-      });
-
-      setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
-
-      toast.success("Post deleted succesfully!", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        draggable: true
-      })
-    } catch (error) {
-      toast.error("Error deleting post.", {
-        position: "top-right",
-        autoClose: 1500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        draggable: true
-      })
-      console.log(error)
-    }
-  };
-
   const openDeleteModal = (post: Post) => {
     setPostToDelete(post);
     setDeleteModalVisible(true);
-  };
-  
-  const closeDeleteModal = () => {
-    setDeleteModalVisible(false);
-    setPostToDelete(null);
   };
     
   return (
@@ -240,7 +131,7 @@ export default function Homepage() {
         <ToastContainer />
         <Header />  
         <SearchBar />
-        <div className="p-5">
+        <div className="p-5 bg-white">
           {loading && <Loader />}
           <h1 className="text-4xl font-semibold mb-8 text-center text-gray-800">Posts</h1>
 
@@ -250,7 +141,7 @@ export default function Homepage() {
               minHeight: `calc(100vh - 13rem)`,
             }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-white">
               {posts.map((post) => (
                 <div
                   key={post._id}
@@ -259,7 +150,7 @@ export default function Homepage() {
                 >
                   <h2 className="text-xl font-semibold text-gray-700">
                     <Link href={post.userId.email === localStorage.getItem("userEmail") ? "/profile" : `/userProfile/${post.userId.email}`}>
-                      {post.userId.email || "Anonymous"}
+                      {post.userId.email}
                     </Link>
                   </h2>
                   <p className="text-gray-600 mt-2">{post.description}</p>
@@ -286,7 +177,7 @@ export default function Homepage() {
                         className="text-blue-500 hover:text-blue-700"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleEdit(post._id, post.description);
+                          handleEdit(post._id);
                         }}
                       >
                         Edit
@@ -308,86 +199,15 @@ export default function Homepage() {
           </div>
 
           {showModal && selectedPostId && (
-            <div
-              className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  closeModal();
-                }
-              }}
-            >
-              <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3 max-h-[90vh] overflow-y-auto">
-                <button
-                  onClick={closeModal}
-                  className="absolute top-2 right-2 text-xl font-bold text-gray-500 hover:text-gray-800 transition-all"
-                >
-                  ×
-                </button>
-                {posts.find(post => post._id === selectedPostId) ? (
-                  <>
-                   <h2 className="text-xl font-semibold">
-                      <Link 
-                        href={
-                          posts.find(post => post._id === selectedPostId)?.userId.email === localStorage.getItem("userEmail") 
-                            ? "/profile" 
-                            : `/userProfile/${posts.find(post => post._id === selectedPostId)?.userId.email}`
-                        }
-                      >
-                        {posts.find(post => post._id === selectedPostId)?.userId.email || "Anonymous"}
-                      </Link>
-                    </h2>
-                    <p className="text-gray-600">{posts.find(post => post._id === selectedPostId)?.description}</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      Posted on: {new Date(posts.find(post => post._id === selectedPostId)?.createdAt || "").toLocaleString()}
-                    </p>
+            <CommentModal
+              post={posts.find((post) => post._id === selectedPostId)!}
+              onClose={closeModal}
+              onComment={handleComment}
+              commentText={commentText}
+              setCommentText={setCommentText}
+            />
+      )}
 
-                    <div className="mt-4 max-h-[300px] overflow-y-auto">
-                      <h3 className="font-semibold text-gray-700">Comments:</h3>
-                      {posts
-                        .find((post) => post._id === selectedPostId)
-                        ?.comments.map((comment, index) => (
-                          <div key={index} className="p-2 mt-2 bg-gray-100 rounded-md shadow-sm">
-                            <p className="font-semibold">
-                              <Link href={comment.userId === localStorage.getItem("userEmail") ? "/profile" : `/userProfile/${comment.userId}`}>
-                                {comment.userId}
-                              </Link>
-                            </p>
-                            <p>{comment.text}</p>
-                            <p className="text-sm text-gray-500">
-                              Posted on: {new Date(comment.createdAt).toLocaleString()}
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-
-                    <div className="mt-4">
-                      <textarea
-                        ref={commentInputRef}
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        rows={4}
-                        placeholder="Write a comment..."
-                      ></textarea>
-                      <button
-                        onClick={() => {
-                          if (commentText.trim()) {
-                            handleComment(selectedPostId, commentText);
-                          }
-                        }}
-                        className="mt-2 w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 transition-all"
-                      >
-                        Post Comment
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <p>Post not found.</p>
-                )}
-              </div>
-            </div>
-          )}
 
           {editModalVisible && postToEdit && (
             <EditModal

@@ -1,13 +1,7 @@
-import { Post } from "../types";
+import { DeleteModalProps } from "../types";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-interface DeleteModalProps {
-  postToDelete: Post | null;
-  setDeleteModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
-}
 
 const DeleteModal: React.FC<DeleteModalProps> = ({ postToDelete, setDeleteModalVisible, setPosts }) => {
   const handleDelete = async () => {

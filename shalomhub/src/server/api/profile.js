@@ -1,8 +1,9 @@
-const express = require('express');
-const User = require('../models/User');
-const Notification = require('../models/Notification');
+import express from 'express';
+import User from '../models/User.js';
+import Notification from '../models/Notification.js';
+import { io } from '../server.js';
+
 const router = express.Router();
-const { io } = require("../server");
 
 // pobieranie profilu
 router.get('/', async (req, res) => {
@@ -95,6 +96,8 @@ router.get('/searchUsers', async (req, res) => {
 
 // obsługa friend requestów
 router.post('/friendRequests', async (req, res) => {
+  console.log('senderEmail:', req.body.senderEmail);
+  console.log('receiverEmail:', req.body.receiverEmail);
   const { senderEmail, receiverEmail } = req.body;
 
   if (!senderEmail || !receiverEmail) {
@@ -234,7 +237,6 @@ router.delete('/friend-request/reject', async (req, res) => {
 
   try {
     const user = await User.findById(decodedUserId);
-    const allUsers = await User.find();
     const friend = await User.findOne({ email: decodedFriendEmail });
 
     if (!user || !friend) {

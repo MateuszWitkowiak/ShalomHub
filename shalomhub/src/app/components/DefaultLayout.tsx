@@ -7,7 +7,7 @@ interface DefaultLayoutProps {
 function DefaultLayout(props: DefaultLayoutProps) {
     return (
         <div>
-            <div className="content">{props.children}</div>
+            <div className="content bg-white">{props.children}</div>
         </div>
     )
 }

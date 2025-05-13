@@ -1,14 +1,8 @@
 import { useState } from "react";
-import { Post } from "../types";
+import { EditModalProps } from "../types";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
+import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-interface EditModalProps {
-  postToEdit: Post | null;
-  setEditModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
-}
 
 const EditModal: React.FC<EditModalProps> = ({ postToEdit, setEditModalVisible, setPosts }) => {
   const [description, setDescription] = useState(postToEdit?.description || "");

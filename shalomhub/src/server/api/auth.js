@@ -1,6 +1,6 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const User = require("../models/User");
+import express from "express";
+import bcrypt from "bcrypt";
+import User from "../models/User.js";
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.post("/register", async (req, res) => {
         await newUser.save();
         res.status(201).json({ message: "User created successfully" });
     } catch (error) {
-        res.status(500).json({ error: "Error saving user" });
+        res.status(500).json({ error: `Error saving user: ${error}` });
     }
 });
 

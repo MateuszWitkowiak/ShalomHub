@@ -76,7 +76,7 @@ export default function UserProfile() {
 
       await axios.post(`http://localhost:3001/api/profile/friendRequests`, {
         senderEmail: currentUserEmail,
-        receiverEmail: userId,
+        receiverEmail: decodeURIComponent(userId),
         requestId: uuidv4(),
       });
 
@@ -96,7 +96,7 @@ export default function UserProfile() {
       }
 
       await axios.post(`http://localhost:3001/api/profile/removeFriend`, {
-        userEmail: userId,
+        userEmail: decodeURIComponent(userId),
         friendEmail: currentUserEmail,
       });
 

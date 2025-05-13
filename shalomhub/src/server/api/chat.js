@@ -1,9 +1,9 @@
-const express = require("express");
-const Message = require("../models/Message");
-const Room = require("../models/Room");
-const User = require("../models/User");
-const Notification = require("../models/Notification")
-const { io } = require("../server");
+import express from "express";
+import Message from "../models/Message.js";
+import Room from "../models/Room.js";
+import User from "../models/User.js";
+import Notification from "../models/Notification.js";
+import { io } from "../server.js";
 
 const router = express.Router();
 

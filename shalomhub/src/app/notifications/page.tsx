@@ -1,29 +1,30 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import axios from "axios";
-import io from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import Header from "../components/Header";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
+import Notification from "./types";
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const [socket, setSocket] = useState<any>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [skip, setSkip] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedUserId = localStorage.getItem("userId");
-      if (storedUserId) {
-        setUserId(storedUserId);
-      }
+
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
+      setUserId(storedUserId);
     }
+
 
     const socketConnection = io("http://localhost:3001");
     setSocket(socketConnection);
@@ -40,7 +41,7 @@ export default function Notifications() {
 
     socket.emit("joinNotificationsRoom", userId);
 
-    socket.on("notification", (notification: any) => {
+    socket.on("notification", (notification: Notification) => {
       setNotifications((prevNotifications) => [notification, ...prevNotifications]);
     });
 
@@ -48,7 +49,7 @@ export default function Notifications() {
       socket.off("notification");
     };
   }, [socket, userId]);
-
+  
   const loadNotifications = () => {
     if (loading || !userId) return;
 
@@ -61,12 +62,8 @@ export default function Notifications() {
       .then((response) => {
         const newNotifications = response.data;
 
-        setNotifications((prevNotifications) => [
-          ...prevNotifications,
-          ...newNotifications,
-        ]);
-
-        setSkip((prevSkip) => prevSkip + 10); 
+        setNotifications((prev) => [...prev, ...newNotifications]);
+        setSkip((prev) => prev + 10);
         if (newNotifications.length < 10) {
           setHasMore(false);
         }
@@ -77,9 +74,10 @@ export default function Notifications() {
       .finally(() => {
         setLoading(false);
       });
-  };
+  }
 
-  const handleNotificationClick = (notification: any) => {
+
+  const handleNotificationClick = (notification: Notification) => {
     if (notification.type === "message") {
       router.push("/chat");
     } else if (notification.type === "like" || notification.type === "comment") {
@@ -88,7 +86,7 @@ export default function Notifications() {
       router.push("/profile")
     }
   };
-  
+
 
   useEffect(() => {
     loadNotifications();

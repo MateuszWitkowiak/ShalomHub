@@ -10,7 +10,7 @@ const EventList: React.FC<EventListProps> = ({
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const userEmail = typeof window !== "undefined" ? localStorage.getItem("userEmail") : null;
+  const userEmail = localStorage.getItem("userEmail");
 
   const openDeleteModal = (eventId: string) => {
     setSelectedEventId(eventId);
@@ -28,6 +28,7 @@ const EventList: React.FC<EventListProps> = ({
     }
     closeDeleteModal();
   };
+  
 
   return (
     <>
@@ -78,8 +79,6 @@ const EventList: React.FC<EventListProps> = ({
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
         onConfirm={confirmDelete}
-        title="Delete Event"
-        message="Are you sure you want to delete this Event?"
       />
     </>
   );

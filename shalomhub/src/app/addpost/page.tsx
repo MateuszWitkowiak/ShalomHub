@@ -43,7 +43,7 @@ export default function AddPost() {
     }
 
     try {
-      const response = await axios.post("http://localhost:3001/api/posts/add", {
+      await axios.post("http://localhost:3001/api/posts/add", {
         description,
         email,
       });
@@ -62,7 +62,7 @@ export default function AddPost() {
     <DefaultLayout>
       <ProtectedRoute>
         <Header />
-        <div className="flex justify-center flex-col border border-gray-300 rounded-md p-6 m-5 h-[calc(100vh-8rem)] overflow-hidden">
+        <div className="flex justify-center flex-col border border-gray-300 rounded-md p-6 m-5 h-[calc(100vh-8rem)] overflow-hidden bg-white">
           <h1 className="text-4xl font-semibold text-gray-700 text-center mb-6">Add New Post</h1>
           
           <div className="mt-5">
