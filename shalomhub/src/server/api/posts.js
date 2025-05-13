@@ -1,8 +1,9 @@
+  import express from "express";
   import Post from "../models/Post.js";
   import User from "../models/User.js";
   import { io } from "../server.js";
   import Notification from "../models/Notification.js";
-  
+  const router = express.Router();
   // dodawanie posta
   router.post("/add", async (req, res) => {
     const { description, email } = req.body;
@@ -241,7 +242,4 @@
   
 
   
-  
-
-
-  module.exports = router;
+  export default router;

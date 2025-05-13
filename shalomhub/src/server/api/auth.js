@@ -52,4 +52,4 @@ router.post("/login", async (req, res) => {
     res.status(200).json({ message: "Login successful", userId: user._id  });
 });
 
-module.exports = router;
+export default router;

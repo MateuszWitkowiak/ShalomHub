@@ -1,16 +1,16 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const http = require("http");
-const socketIo = require("socket.io");
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
 
-const Message = require('./models/Message');
-const Room = require('./models/Room');
-const User = require('./models/User')
+import Message from "./models/Message.js";
+import Room from './models/Room.js';
+import User from './models/User.js';
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
+const io = new SocketIOServer(server, {
     cors: {
         origin: 'http://localhost:3000',
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
@@ -18,7 +18,7 @@ const io = socketIo(server, {
     }
 });
 
-module.exports = { io };
+export { io };
 
 app.use(cors({
     origin: 'http://localhost:3000',
@@ -32,11 +32,11 @@ mongoose.connect("mongodb+srv://boskiraptor2:oFocmXHWMq3zDsjo@cluster0.1nr7u.mon
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.log("MongoDB connection error:", err));
 
-const authRoutes = require("./api/auth");
-const postRoutes = require("./api/posts");
-const profileRoutes = require("./api/profile");
-const eventRoutes = require("./api/events");
-const chatRoutes = require("./api/chat");
+import authRoutes from "./api/auth.js";
+import postRoutes from "./api/posts.js";
+import profileRoutes from "./api/profile.js";
+import eventRoutes from "./api/events.js";
+import chatRoutes from "./api/chat.js";
 
 app.use("/api", authRoutes);
 app.use("/api/posts", postRoutes);
